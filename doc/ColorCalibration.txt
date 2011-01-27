@@ -1,0 +1,22 @@
+
+Trace the hand as a polygon in a particular position
+* Sample parameters (saturation, exposure, gain, brightness, blue, red) until the maximum number of pixels in the hand region are classified.
+* Take the pixels, cluster into 10 colors with k-means with multiple restarts OR
+Trace each of the color regions as polygons in a particular position
+
+Find a single linear transformation so that all of the colors are classified appropriately
+
+LowFrequencyColorCalibrate
+
+Map<Color3f, List<Color3f>> challengeMap = ColorCalibrationUtils
+    .makeInputToColorMap(challenge);
+
+public class ColorCalibrationMeanData
+
+Color calibration:
+1. Trace colors at the standard target lighting condition
+	1.1 8 positions for hand with glove
+	1.2 one picture with glove on the table
+	
+MatrixSolveUtils.computeSafeInverse(A, eps);
+SingularValueDecomposition
