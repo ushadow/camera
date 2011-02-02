@@ -17,7 +17,8 @@ import yingyin.webcam.gui.WebcamView;
 
 public class WebcamModel {
 	
-	public static final String CAM_REC_DIR = EnvConstants.LOCAL_FOLDER + EnvConstants.CALIB_DATA_DIR;
+	public static final String CAM_REC_DIR = EnvConstants.LOCAL_FOLDER + 
+	                                         EnvConstants.CALIB_DATA_DIR;
 	
 	private boolean captureStarted = false;
 	private boolean continuousRecording = false;
@@ -30,7 +31,7 @@ public class WebcamModel {
 	private Thread savingThread = null;
 	private static final int WIDTH = 640;
 	private static final int HEIGHT = 480;
-	private BlockingQueue<BufferedImage> bq = 
+	private BlockingQueue<BufferedImage> blockingQueue = 
 	    new LinkedBlockingQueue<BufferedImage>();
 	
 	public WebcamModel(IWebcamDriver webcamDriver) {		
@@ -94,7 +95,7 @@ public class WebcamModel {
 				long totalElapsed = 0;
 				long totalFrames = 0;
 				
-				while(captureStarted) {
+				while (captureStarted) {
 					try {
 						long startTime = System.nanoTime();
 						driver.captureNow(ib, WIDTH, HEIGHT);
@@ -102,17 +103,16 @@ public class WebcamModel {
 						ImageConvertUtils.IntBuffer2BufferedImage(ib, bi);
 						totalElapsed += elapsed;
 						totalFrames++;
-					
 						wv.setImage(bi);	
-						
 						if (continuousRecording)
-							bq.offer(bi);
-					
-					} catch(Exception e2) { }
+							blockingQueue.offer(bi);
+					} catch (Exception e) {
+					  e.printStackTrace();
+					}
 				}
 				
 				System.out.println("Average capture elapsed time is " + 
-				    totalElapsed/(totalFrames*1000000) + "ms.");
+				    totalElapsed / (totalFrames * 1000000) + "ms.");
 			}
 		});
 		
@@ -170,7 +170,7 @@ public class WebcamModel {
 				String fileName = filePrefix + index + IMAGE_TYTE;
 				index++;         
 				try {
-					ImageIO.write(bq.take(),"PNG", new File(fileName));
+					ImageIO.write(blockingQueue.take(),"PNG", new File(fileName));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -1,1 +1,10 @@
 bin
+
+# VisualStudio intermdiate files folder
+Release
+
+# Binary files from VisualStudio
+*.ncb
+*.suo
+
+

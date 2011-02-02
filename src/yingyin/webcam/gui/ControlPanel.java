@@ -21,9 +21,6 @@ import yingyin.webcam.WebcamDriverFirei;
 public class ControlPanel extends JPanel implements ChangeListener, 
                                                     ItemListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JSlider slider;
 	private WebcamDriverFirei td;

@@ -23,7 +23,7 @@ import edu.mit.yingyin.gui.StatusBar;
 import yingyin.common.EnvConstants;
 import yingyin.webcam.ControlDialog;
 import yingyin.webcam.IWebcamDriver;
-import yingyin.webcam.WebcamDriverJmf;
+import yingyin.webcam.WebcamDriverFirefly;
 import yingyin.webcam.WebcamModel;
 import yingyin.webcam.WebcamDriverFirei;
 
@@ -238,7 +238,7 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
 	}
 
 	public static void main(String[] args) {
-		IWebcamDriver driver = new WebcamDriverJmf();
+		IWebcamDriver driver = new WebcamDriverFirefly();
 		WebcamView wv = new WebcamView("Webcam", new WebcamModel(driver));
 		wv.showUI();
 	}

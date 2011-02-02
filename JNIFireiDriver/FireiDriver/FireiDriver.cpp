@@ -139,73 +139,69 @@ void FireiDriver::initialize(int cameraIndex)
 }
 
 /*-----------------------------------------------------------------------------------------------*/
-void FireiDriver::getCameraDescription(Camera* a_Camera)
-{
-    char                szTmp[128];
-    FIREi_STATUS        FireiStatus;
+void FireiDriver::getCameraDescription(Camera* a_Camera) {
+  char                szTmp[128];
+  FIREi_STATUS        FireiStatus;
 	//FIREi_CAMERA_SUPPORTED_FORMAT fcsf;
 
-    FireiStatus = FiQueryCameraRegister( a_Camera->hCamera, 
-                                         OID_VENDOR_NAME,
-                                         szTmp,
-                                         sizeof(szTmp));
+  FireiStatus = FiQueryCameraRegister( a_Camera->hCamera, 
+                                       OID_VENDOR_NAME,
+                                       szTmp,
+                                       sizeof(szTmp));
 
 	_HANDLE_ERROR(FireiStatus, "FireiDriver::getCameraDesription()");
 
-    strcpy_s(a_Camera->szCamDescription,szTmp);
-    strcat_s(a_Camera->szCamDescription,"  ");
+  strcpy_s(a_Camera->szCamDescription,szTmp);
+  strcat_s(a_Camera->szCamDescription,"  ");
 
-    FireiStatus = FiQueryCameraRegister( a_Camera->hCamera, 
-                                         OID_MODEL_NAME,
-                                         szTmp,
-                                         sizeof(szTmp));
+  FireiStatus = FiQueryCameraRegister( a_Camera->hCamera, 
+                                       OID_MODEL_NAME,
+                                       szTmp,
+                                       sizeof(szTmp));
 
-    _HANDLE_ERROR(FireiStatus, "FireiDriver::getCameraDesription()");
+  _HANDLE_ERROR(FireiStatus, "FireiDriver::getCameraDesription()");
 
-    strcat_s(a_Camera->szCamDescription,szTmp);
-    strcat_s(a_Camera->szCamDescription,"  ");
+  strcat_s(a_Camera->szCamDescription,szTmp);
+  strcat_s(a_Camera->szCamDescription,"  ");
 
 	//FireiStatus = FiQueryCameraRegister(a_Camera->hCamera,OID_CAMERA_VIDEO_FORMATS, &fcsf, sizeof(FIREi_CAMERA_SUPPORTED_FORMAT));
 	//printf("Supported format: %0x\n", fcsf.uFormat);
 	//printf("Supported mode for format 0: %x\n", fcsf.SupportedMode[0].uMode);
 	//printf("Supported mode for mode 4: %x\n", fcsf.SupportedMode[0].FrameRate[3]);
-    return; 
+  return; 
 }
 
 /*-----------------------------------------------------------------------------------------------*/
-void FireiDriver::printCameraDescriptions()
-{
-    puts("******************* Bus Cameras Found ***********************");
-    for(int i=0;i<m_totalCameras;i++)
-    {
-        if(FiIsCameraConnected(m_cameraArray[i].hCamera))
-            puts(m_cameraArray[i].szCamDescription);
-    }
-    puts("*************************************************************");
+void FireiDriver::printCameraDescriptions() {
+  puts("******************* Bus Cameras Found ***********************");
+  for(int i=0;i<m_totalCameras;i++)
+  {
+      if(FiIsCameraConnected(m_cameraArray[i].hCamera))
+          puts(m_cameraArray[i].szCamDescription);
+  }
+  puts("*************************************************************");
 
-    printf("\n\n");
+  printf("\n\n");
 
-    return;
+  return;
 }
 
 //------------------------------------------------------------------------------------
 // Create and start an isoch receive engine for the first camera found
-void FireiDriver::initIsochEngine()
-{
-    FIREi_STATUS                FireiStatus;
+void FireiDriver::initIsochEngine() {
+  FIREi_STATUS FireiStatus;
 
-    FireiStatus = FiCreateIsochReceiveEngineEx(&m_hIsochEngine,1,&m_channelStartProcessingEvent);
-	_HANDLE_ERROR(FireiStatus, "FireiDriver::InitIsochEngine()");
+  FireiStatus = FiCreateIsochReceiveEngineEx(&m_hIsochEngine,1,&m_channelStartProcessingEvent);
+  _HANDLE_ERROR(FireiStatus, "FireiDriver::InitIsochEngine()");
 
-	FireiStatus = FiAllocateFrames(m_hIsochEngine, &m_startupInfo, QUEUED_FRAMES);
-	_HANDLE_ERROR(FireiStatus, "FireiDriver::InitIsochEngine()");
+  FireiStatus = FiAllocateFrames(m_hIsochEngine, &m_startupInfo, QUEUED_FRAMES);
+  _HANDLE_ERROR(FireiStatus, "FireiDriver::InitIsochEngine()");
 
-    FireiStatus = FiStartIsochReceiveEngineEx(m_hIsochEngine);
-    _HANDLE_ERROR(FireiStatus, "FireiDriver::InitIsochEngine()");
+  FireiStatus = FiStartIsochReceiveEngineEx(m_hIsochEngine);
+  _HANDLE_ERROR(FireiStatus, "FireiDriver::InitIsochEngine()");
 }
 
-void FireiDriver::cleanup()
-{
+void FireiDriver::cleanup() {
 	FIREi_STATUS FireiStatus;
 
 	if(!m_initialized)
@@ -228,37 +224,30 @@ void FireiDriver::cleanup()
 	fflush(stdout);
 }
 
-void FireiDriver::freeCameraHandles()
-{
+void FireiDriver::freeCameraHandles() {
 	FIREi_STATUS        FireiStatus;
 
-	for(int i=0; i<m_totalCameras; i++)
-	{
-		if(m_cameraArray[i].hCamera)
-		{
+	for(int i=0; i<m_totalCameras; i++) {
+		if(m_cameraArray[i].hCamera) {
 			FireiStatus = FiCloseCameraHandle(m_cameraArray[i].hCamera);
 			_HANDLE_ERROR(FireiStatus, "FireiDriver::freeCameraHandles()");
 		}		
 	}
 }
 
-void FireiDriver::capturenow(unsigned char* pimageBGRA32, int width, int height)
-{
+void FireiDriver::capturenow(unsigned char* pimageBGRA32, int width, int height) {
 	PFIREi_CAMERA_FRAME		pCameraFrame;
 	ULONG					uCompleteFrames;
 	ULONG					I;
 	PFIREi_CAMERA_FRAME		pFramesArray[QUEUED_FRAMES];	
 
-	if(*m_hCamera)
-	{
-		switch(WaitForSingleObject(m_channelStartProcessingEvent, INFINITE))
-		{
+	if (*m_hCamera) {
+		switch(WaitForSingleObject(m_channelStartProcessingEvent, INFINITE)) {
 			case WAIT_OBJECT_0:
 				
 				uCompleteFrames = 0;
 				//Get as many frames as possible in the buffer
-				for(;;)
-				{
+				for(;;) {
 					pCameraFrame = FiGetNextCompleteFrameEx(m_hIsochEngine);
 
 					if(NULL == pCameraFrame)
@@ -269,40 +258,37 @@ void FireiDriver::capturenow(unsigned char* pimageBGRA32, int width, int height)
 				}
 
 
-				if(0==uCompleteFrames)
+				if (0 == uCompleteFrames)
 					printf("FireiDriver::capturenow: zero complete frames\n");
 
 				I = 0;
 
-				if (uCompleteFrames > 1)
-                {
-                        //printf("%u Frames recieved\n",uCompleteFrames);
-    
-                        // Requeue all the frames except for the last one
-                        for(I=0;I<(uCompleteFrames - 1);I++)
-                            FiReleaseFrame(pFramesArray[I]);
-                }
+				if (uCompleteFrames > 1) {
+          //printf("%u Frames recieved\n",uCompleteFrames);
 
-				if(FIREi_STATUS_SUCCESS == pFramesArray[I]->FireiStatus)
-				{
+          // Requeue all the frames except for the last one
+          for (I = 0; I < (uCompleteFrames - 1); I++)
+            FiReleaseFrame(pFramesArray[I]);
+        }
+
+				if (FIREi_STATUS_SUCCESS == pFramesArray[I]->FireiStatus) {
 					int index, cameraBufferIndex, returnBufferIndex;
 
-					for(int h = 0; h< height; h++)
-						for(int w = 0; w<width; w++)
-						{
-							index = (w+h*width);
-							cameraBufferIndex = index*3;
-							returnBufferIndex = index*4;
-							*(pimageBGRA32+returnBufferIndex + 3) = 0xff;
+					for (int h = 0; h < height; h++)
+						for (int w = 0; w < width; w++) {
+							index = w + h * width;
+							cameraBufferIndex = index * 3;
+							returnBufferIndex = index * 4;
+              // Set the alpha byte to 0xff (255)
+							*(pimageBGRA32 + returnBufferIndex + 3) = 0xff;
 							
 							//The order of bytes in the camera buffer is R,G,B,R,G,B... see document "DCAM_Spec_V1_30.pdf"
 							//The order of bytes in the return buffer is BGRA. The IntBuffer is little endian.
-							for(int i = 0; i<3; i++)
-								*(pimageBGRA32+returnBufferIndex+i) = *((unsigned char*)(pFramesArray[I]->pCameraFrameBuffer) + cameraBufferIndex + 2 - i);
+							for (int i = 0; i < 3; i++)
+								*(pimageBGRA32 + returnBufferIndex + i) = *((unsigned char*)(pFramesArray[I]->pCameraFrameBuffer) + cameraBufferIndex + 2 - i);
 						}
 					//printf("Frame received at time: %u\n",pFramesArray[I]->dwTimeStamp);
-				}
-				else _HANDLE_ERROR(pFramesArray[I]->FireiStatus,"FireiDriver::capturenow");
+				} else _HANDLE_ERROR(pFramesArray[I]->FireiStatus,"FireiDriver::capturenow");
 
 				FiReleaseFrame(pFramesArray[I]);
 				break;
@@ -311,14 +297,11 @@ void FireiDriver::capturenow(unsigned char* pimageBGRA32, int width, int height)
 				break;
 		}
 	}
-
 	fflush(stdout);
-
 }
 
 //Effects: If setting property is successful, return 0; else return -1.
-int FireiDriver::setProperty(int controlIndex, int value)
-{
+int FireiDriver::setProperty(int controlIndex, int value) {
 	FIREi_CAMERA_FEATURE_CONTROL_REGISTER fcfcr;
 	FIREi_STATUS	FireiStatus;
 
@@ -338,8 +321,7 @@ int FireiDriver::setProperty(int controlIndex, int value)
 	return -1;
 }
 
-int FireiDriver::getCurrentProperty(int controlIndex, int* value, int* isAuto)
-{
+int FireiDriver::getCurrentProperty(int controlIndex, int* value, int* isAuto) {
 	FIREi_CAMERA_FEATURE_CONTROL_REGISTER fcfcr;
 	FIREi_STATUS	FireiStatus;
 
@@ -347,8 +329,7 @@ int FireiDriver::getCurrentProperty(int controlIndex, int* value, int* isAuto)
 
 	FireiStatus = FiQueryCameraRegister(*m_hCamera, m_CAMERA_CONTROLS[controlIndex], &fcfcr, sizeof(FIREi_CAMERA_FEATURE_CONTROL_REGISTER));
 
-	if(FireiStatus == FIREi_STATUS_SUCCESS)
-	{
+	if(FireiStatus == FIREi_STATUS_SUCCESS) {
 		*value = fcfcr.ushCurValue;
 		*isAuto = fcfcr.bSetAuto;
 		//printf("FireiDriver::getCurrentProperty value = %d, isAuto = %d\n", *value, *isAuto);
@@ -360,8 +341,7 @@ int FireiDriver::getCurrentProperty(int controlIndex, int* value, int* isAuto)
 	return -1;
 }
 
-int FireiDriver::queryProperty(int controlIndex, int* min, int* max)
-{
+int FireiDriver::queryProperty(int controlIndex, int* min, int* max) {
 	FIREi_CAMERA_FEATURE_INQUIRY_REGISTER fcfir;
 	FIREi_STATUS	FireiStatus;
 
@@ -369,8 +349,7 @@ int FireiDriver::queryProperty(int controlIndex, int* min, int* max)
 	if(*m_hCamera)
 		FireiStatus = FiQueryCameraRegister(*m_hCamera, m_CAMERA_INQ[controlIndex], &fcfir, sizeof(FIREi_CAMERA_FEATURE_INQUIRY_REGISTER));
 
-	if(FireiStatus == FIREi_STATUS_SUCCESS && fcfir.bIsReadable)
-	{
+	if(FireiStatus == FIREi_STATUS_SUCCESS && fcfir.bIsReadable) {
 		*min = (int)fcfir.ushMinValue;
 		*max = (int)fcfir.ushMaxValue;
 		return 0;
@@ -379,8 +358,7 @@ int FireiDriver::queryProperty(int controlIndex, int* min, int* max)
 	return -1;
 }
 
-void FireiDriver::setAutoProtpery(int controlIndex)
-{
+void FireiDriver::setAutoProtpery(int controlIndex) {
 	FIREi_CAMERA_FEATURE_CONTROL_REGISTER fcfcr;
 	FIREi_STATUS	FireiStatus;
 
