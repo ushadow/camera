@@ -21,7 +21,6 @@ import javax.swing.KeyStroke;
 import edu.mit.yingyin.gui.StatusBar;
 
 import yingyin.common.EnvConstants;
-import yingyin.webcam.ControlDialog;
 import yingyin.webcam.IWebcamDriver;
 import yingyin.webcam.WebcamDriverFirefly;
 import yingyin.webcam.WebcamModel;

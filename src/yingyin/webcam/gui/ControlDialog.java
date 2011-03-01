@@ -1,11 +1,11 @@
-package yingyin.webcam;
+package yingyin.webcam.gui;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import yingyin.webcam.gui.ControlPanel;
+import yingyin.webcam.WebcamDriverFirei;
 
 /**
  * Control dialog for adjusting parameters of Firei camera.
@@ -25,7 +25,7 @@ public class ControlDialog extends JFrame {
 		super("Control");
 		
 		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.EXPOSURE, wdf));
 		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.GAIN, wdf));
