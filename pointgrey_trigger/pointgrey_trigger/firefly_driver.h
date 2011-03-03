@@ -1,5 +1,7 @@
 // A wrapper around Point Grey Research's FlyCapture API (v1.0.0.13) for
 // capturing images through external triggering.
+// The camera starts with the external trigger mode 0. The other controls of the camera
+// is not exposed yet.
 #ifndef _H_FIREFLY_DRIVER_
 #define _H_FIREFLY_DRIVER_
 

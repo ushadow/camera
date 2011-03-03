@@ -4,6 +4,10 @@ import java.nio.IntBuffer;
 
 import rywang.util.DirectBufferUtils;
 
+// Simple wrapper of the Firefly camera.
+//
+// Control of the camera can be done through the FlyCap program privided by 
+// Point Grey Research.
 public class WebcamDriverFirefly implements IWebcamDriver {
   
   private static final int FRAME_RATE = 30;
@@ -15,12 +19,15 @@ public class WebcamDriverFirefly implements IWebcamDriver {
   public WebcamDriverFirefly() {
     controlBlock = DirectBufferUtils.allocateIntBuffer(2);
   }
+  
   @Override
+  // Starts the camera in the exteranl trigger mode 0.
   public void initialize(int camera) {
     initialize(controlBlock, camera, FRAME_RATE);
   }
 
   @Override
+  // Captures a new image until there is an external trigger.
   public void captureNow(IntBuffer image, int width, int height) {
     captureNow(controlBlock, image, width, height);
   }
