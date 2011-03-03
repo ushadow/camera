@@ -16,7 +16,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import yingyin.webcam.WebcamDriverFirei;
+import edu.mit.yingyin.webcam.WebcamDriverFirei;
+
 
 public class ControlPanel extends JPanel implements ChangeListener, 
                                                     ItemListener {

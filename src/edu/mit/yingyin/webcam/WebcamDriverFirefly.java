@@ -1,4 +1,4 @@
-package yingyin.webcam;
+package edu.mit.yingyin.webcam;
 
 import java.nio.IntBuffer;
 

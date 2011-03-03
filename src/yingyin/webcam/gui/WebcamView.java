@@ -19,12 +19,12 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import edu.mit.yingyin.gui.StatusBar;
+import edu.mit.yingyin.webcam.IWebcamDriver;
+import edu.mit.yingyin.webcam.WebcamDriverFirefly;
+import edu.mit.yingyin.webcam.WebcamDriverFirei;
+import edu.mit.yingyin.webcam.WebcamModel;
 
 import yingyin.common.EnvConstants;
-import yingyin.webcam.IWebcamDriver;
-import yingyin.webcam.WebcamDriverFirefly;
-import yingyin.webcam.WebcamModel;
-import yingyin.webcam.WebcamDriverFirei;
 
 /**
  * Main frame for display webcam images. Allows saving of the image.

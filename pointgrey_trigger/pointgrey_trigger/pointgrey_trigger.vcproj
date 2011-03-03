@@ -109,7 +109,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;H:\ProgramFiles\Point Grey Research\PGR FlyCapture\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_14\include\win32&quot;;&quot;C:\Program Files\Java\jdk1.6.0_14\include&quot;"
+				AdditionalIncludeDirectories="include"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -129,7 +129,7 @@
 				AdditionalDependencies="pgrflycapture.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;H:\ProgramFiles\Point Grey Research\PGR FlyCapture\lib&quot;"
+				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -185,7 +185,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\yingyin_webcam_WebcamDriverFirefly.h"
+				RelativePath=".\firefly_driver_jni.h"
 				>
 			</File>
 		</Filter>

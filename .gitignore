@@ -1,7 +1,9 @@
 bin
 
-# VisualStudio intermdiate files folder
+# VisualStudio intermdiate files and folder
 Release
+*.exp
+*.pdb
 
 # Binary files from VisualStudio
 *.ncb

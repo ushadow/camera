@@ -5,7 +5,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import yingyin.webcam.WebcamDriverFirei;
+import edu.mit.yingyin.webcam.WebcamDriverFirei;
+
 
 /**
  * Control dialog for adjusting parameters of Firei camera.
