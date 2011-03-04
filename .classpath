@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/jmf.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/YYUtils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/camera"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

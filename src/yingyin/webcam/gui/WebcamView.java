@@ -19,8 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import edu.mit.yingyin.gui.StatusBar;
-import edu.mit.yingyin.webcam.IWebcamDriver;
-import edu.mit.yingyin.webcam.WebcamDriverFirefly;
+import edu.mit.yingyin.camera.IWebcamDriver;
+import edu.mit.yingyin.camera.WebcamDriverFirefly;
 import edu.mit.yingyin.webcam.WebcamDriverFirei;
 import edu.mit.yingyin.webcam.WebcamModel;
 

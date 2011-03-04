@@ -4,6 +4,7 @@ import java.nio.IntBuffer;
 import java.util.Vector;
 
 import rywang.util.DirectBufferUtils;
+import edu.mit.yingyin.camera.IWebcamDriver;
 
 public class WebcamDriverFirei implements IWebcamDriver {
 	

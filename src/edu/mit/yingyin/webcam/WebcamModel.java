@@ -1,6 +1,7 @@
 package edu.mit.yingyin.webcam;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -14,6 +15,7 @@ import edu.mit.yingyin.image.ImageConvertUtils;
 
 import yingyin.common.EnvConstants;
 import yingyin.webcam.gui.WebcamView;
+import edu.mit.yingyin.camera.IWebcamDriver;
 
 public class WebcamModel {
 	

@@ -19,6 +19,7 @@ import javax.media.control.FrameRateControl;
 import javax.media.format.VideoFormat;
 
 import rywang.util.DirectBufferUtils;
+import edu.mit.yingyin.camera.IWebcamDriver;
 /**
  * WebcamDriverJmf is a driver for webcams using java media framework
  * @author Ying
