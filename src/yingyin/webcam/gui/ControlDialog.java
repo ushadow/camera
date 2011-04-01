@@ -5,7 +5,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import edu.mit.yingyin.webcam.WebcamDriverFirei;
+import edu.mit.yingyin.camera.CameraDriverFirei;
 
 
 /**
@@ -22,19 +22,19 @@ public class ControlDialog extends JFrame {
 	 * @param wdf Driver for the Firei camera. The driver has to call the 
 	 * initialize method before being passed as a parameter.
 	 */
-	public ControlDialog(WebcamDriverFirei wdf) {
+	public ControlDialog(CameraDriverFirei wdf) {
 		super("Control");
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.EXPOSURE, wdf));
-		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.GAIN, wdf));
-		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.BRIGHTNESS, 
+		panel.add(new ControlPanel(CameraDriverFirei.CameraControl.EXPOSURE, wdf));
+		panel.add(new ControlPanel(CameraDriverFirei.CameraControl.GAIN, wdf));
+		panel.add(new ControlPanel(CameraDriverFirei.CameraControl.BRIGHTNESS, 
 		                           wdf));
-		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.UB, wdf));
-		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.VR, wdf));
-		panel.add(new ControlPanel(WebcamDriverFirei.CameraControl.SATURATION, 
+		panel.add(new ControlPanel(CameraDriverFirei.CameraControl.UB, wdf));
+		panel.add(new ControlPanel(CameraDriverFirei.CameraControl.VR, wdf));
+		panel.add(new ControlPanel(CameraDriverFirei.CameraControl.SATURATION, 
 		                           wdf));
 		
 		setContentPane(panel);

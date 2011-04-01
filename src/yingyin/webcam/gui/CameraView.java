@@ -18,25 +18,64 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import edu.mit.yingyin.gui.StatusBar;
-import edu.mit.yingyin.camera.IWebcamDriver;
-import edu.mit.yingyin.camera.WebcamDriverFirefly;
-import edu.mit.yingyin.webcam.WebcamDriverFirei;
-import edu.mit.yingyin.webcam.WebcamModel;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
+import webcam.IWebcamDriver;
 import yingyin.common.EnvConstants;
+import edu.mit.yingyin.camera.CameraDriverFirefly;
+import edu.mit.yingyin.camera.CameraDriverFirei;
+import edu.mit.yingyin.camera.CameraModel;
+import edu.mit.yingyin.gui.StatusBar;
 
 /**
  * Main frame for display webcam images. Allows saving of the image.
  * @author Ying
  * 
  */
-public class WebcamView extends JFrame implements WindowListener, KeyListener {
+public class CameraView extends JFrame implements WindowListener, KeyListener {
 
+  public static class WebcamViewOptions {
+    
+    public static String saveDir;
+    public static String imagePrefix;
+    public static String imageType;
+    
+    public static void parse(String args[]) {
+      CommandLineParser parser = new GnuParser();
+      Options options = new Options();
+      Option saveDirOption = OptionBuilder.withLongOpt("save-dir").hasArg().
+          create();
+      Option imagePrefixOption = OptionBuilder.withLongOpt("image-prefix").
+          hasArg().create();
+      Option imageTypeOption = OptionBuilder.withLongOpt("image-type").hasArg().
+          create();
+      options.addOption(saveDirOption);
+      options.addOption(imagePrefixOption);
+      options.addOption(imageTypeOption);
+      
+      CommandLine line;
+      try {
+        line = parser.parse(options, args);
+        saveDir = line.getOptionValue("save-dir", "./");
+        imagePrefix = line.getOptionValue("image-prefix", "image");
+        imageType = line.getOptionValue("image-type", "png");
+      } catch (ParseException e) {
+        e.printStackTrace();
+        System.exit(-1);
+      }
+    }
+  }
+  
 	private static final long serialVersionUID = 1L;
 	protected ImagePanel ip;
 	protected IWebcamDriver wd;
-	protected WebcamModel webcamModel = null;
+	protected CameraModel webcamModel = null;
 	
 	/*menu*/
 	private JMenu menuOptions;
@@ -57,7 +96,7 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
 	 * @param _wdf	webcam driver for Firei cambera, it has to be initialized 
 	 * before passed as a parameter
 	 */
-	public WebcamView(String title, WebcamModel webcamModel){
+	public CameraView(String title, CameraModel webcamModel){
 		super(title);
 		this.webcamModel = webcamModel;
 		
@@ -85,8 +124,8 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
     
     setJMenuBar(menuBar);
     
-    if (wd instanceof WebcamDriverFirei)
-    	cd = new ControlDialog((WebcamDriverFirei)this.wd);
+    if (wd instanceof CameraDriverFirei)
+    	cd = new ControlDialog((CameraDriverFirei)this.wd);
     
     webcamModel.startCapture(this);
 	}
@@ -160,7 +199,7 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
 				
 				fc.setCurrentDirectory(new File(lastAccessedDir));
 				
-				int returnValue = fc.showSaveDialog(WebcamView.this);
+				int returnValue = fc.showSaveDialog(CameraView.this);
 				
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					File f = fc.getSelectedFile();
@@ -175,24 +214,8 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
 	public void keyPressed(KeyEvent ke) {
 		switch(ke.getKeyChar()) {
 		case 'c': //continuous recording
-			String saveDir = (String)JOptionPane.showInputDialog(
-          this,
-          "Please input the name of the folder to save in\n"
-          + EnvConstants.LOCAL_FOLDER + "\n",
-          "Input Dialog",
-          JOptionPane.PLAIN_MESSAGE,
-          null,
-          null,
-          "recording");
-			
-			//folder name should not end with "/"
-			if (saveDir!=null && saveDir.length()>0) {
-				saveDir = EnvConstants.LOCAL_FOLDER + saveDir;
-				webcamModel.continuousRecording(saveDir);
-			}
-			else
-				JOptionPane.showMessageDialog(this, "Invalid folder name!", "Error", 
-				                              JOptionPane.ERROR_MESSAGE);
+			webcamModel.continuousRecording(WebcamViewOptions.saveDir + "/" +
+          WebcamViewOptions.imagePrefix, WebcamViewOptions.imageType);
 			break;
 			
 		case 'i':
@@ -205,7 +228,7 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
           JOptionPane.PLAIN_MESSAGE,
           null,null,null);
 			
-			if (s!=null && s.length() > 0) {
+			if (s != null && s.length() > 0) {
 				int i = Integer.parseInt(s); 
 				imageIndex = i;
 			}
@@ -214,13 +237,26 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
 		case 'r':	
 			//record the current image with incremental index as the image name
 	
-			String path = WebcamModel.CAM_REC_DIR + "image" + imageIndex + 
-			    EnvConstants.IMAGE_TYPE;
+			String path = String.format("%s/%s%04d.%s", WebcamViewOptions.saveDir, 
+			    WebcamViewOptions.imagePrefix, imageIndex, 
+			    WebcamViewOptions.imageType);
 			//record the current image
 			ip.saveImage(path);
 			imageIndex++;
 			break;
-			
+		
+		case 's':
+		  webcamModel.stopRecording();
+		  break;
+		  
+		case '8':
+		  webcamModel.decreaseExposure();
+		  break;
+
+		case '9':
+		  webcamModel.increaseExposure();
+		  break;
+		  
 		default:
 			break;
 		}
@@ -237,8 +273,9 @@ public class WebcamView extends JFrame implements WindowListener, KeyListener {
 	}
 
 	public static void main(String[] args) {
-		IWebcamDriver driver = new WebcamDriverFirefly();
-		WebcamView wv = new WebcamView("Webcam", new WebcamModel(driver));
+	  WebcamViewOptions.parse(args);
+		IWebcamDriver driver = new CameraDriverFirefly(false);
+		CameraView wv = new CameraView("Webcam", new CameraModel(driver));
 		wv.showUI();
 	}
 }

@@ -16,7 +16,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.mit.yingyin.webcam.WebcamDriverFirei;
+import edu.mit.yingyin.camera.CameraDriverFirei;
 
 
 public class ControlPanel extends JPanel implements ChangeListener, 
@@ -24,8 +24,8 @@ public class ControlPanel extends JPanel implements ChangeListener,
 
 	private static final long serialVersionUID = 1L;
 	private JSlider slider;
-	private WebcamDriverFirei td;
-	private WebcamDriverFirei.CameraControl control;
+	private CameraDriverFirei td;
+	private CameraDriverFirei.CameraControl control;
 	private JTextField tf;
 	private JCheckBox cb;
 
@@ -36,8 +36,8 @@ public class ControlPanel extends JPanel implements ChangeListener,
 	 * @param _td webcam driver which has to be initialized before it is passed as 
 	 * a parameter
 	 */
-	public ControlPanel(WebcamDriverFirei.CameraControl _control, 
-	                    WebcamDriverFirei _td) {
+	public ControlPanel(CameraDriverFirei.CameraControl _control, 
+	                    CameraDriverFirei _td) {
 		super();
 		setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));

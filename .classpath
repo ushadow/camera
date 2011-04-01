@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="WebCam/native"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jmf.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/YYUtils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/java_util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/HandTrackingPro"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/camera"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

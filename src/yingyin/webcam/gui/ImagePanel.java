@@ -13,7 +13,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import edu.mit.yingyin.utils.FileUtils;
+import edu.mit.yingyin.util.FileUtil;
 
 
 public class ImagePanel extends JPanel implements MouseListener
@@ -24,9 +24,9 @@ public class ImagePanel extends JPanel implements MouseListener
 	private static final long serialVersionUID = 1L;
 	
 	private BufferedImage myimg = null;
-	private WebcamView parent =null;
+	private CameraView parent =null;
 	
-    public ImagePanel(WebcamView mf) 
+    public ImagePanel(CameraView mf) 
     {
       setLayout(null);
       setPreferredSize(new Dimension(640,480));
@@ -67,11 +67,11 @@ public class ImagePanel extends JPanel implements MouseListener
     public void saveImage(File f)
     {
     	try {
-    		String extension = FileUtils.getExtension(f);
-    		if(extension == null || (!extension.equals(FileUtils.JPG)&&!extension.equals(FileUtils.PNG)))
+    		String extension = FileUtil.getExtension(f);
+    		if(extension == null || (!extension.equals(FileUtil.JPG)&&!extension.equals(FileUtil.PNG)))
     		{
-    			extension = FileUtils.PNG;
-    			f = FileUtils.setExtension(f,extension);
+    			extension = FileUtil.PNG;
+    			f = FileUtil.setExtension(f,extension);
     		}
     		
     		ImageIO.write(myimg, extension, f);

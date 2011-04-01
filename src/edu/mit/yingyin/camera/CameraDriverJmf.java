@@ -1,4 +1,4 @@
-package edu.mit.yingyin.webcam;
+package edu.mit.yingyin.camera;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -19,13 +19,13 @@ import javax.media.control.FrameRateControl;
 import javax.media.format.VideoFormat;
 
 import rywang.util.DirectBufferUtils;
-import edu.mit.yingyin.camera.IWebcamDriver;
+import webcam.IWebcamDriver;
 /**
  * WebcamDriverJmf is a driver for webcams using java media framework
  * @author Ying
  *
  */
-public class WebcamDriverJmf implements IWebcamDriver {
+public class CameraDriverJmf implements IWebcamDriver {
 	
 	/* Constants */
 	private static final String CAPTURE_FORMAT = VideoFormat.RGB;
@@ -40,7 +40,7 @@ public class WebcamDriverJmf implements IWebcamDriver {
 	private static Player player = null;
 	private FrameGrabbingControl fgc = null;
 	
-	public WebcamDriverJmf() {}
+	public CameraDriverJmf() {}
 	
 	@Override
 	public IntBuffer allocateImageBuffer() {

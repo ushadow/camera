@@ -1,12 +1,12 @@
-package edu.mit.yingyin.webcam;
+package edu.mit.yingyin.camera;
 
 import java.nio.IntBuffer;
 import java.util.Vector;
 
 import rywang.util.DirectBufferUtils;
-import edu.mit.yingyin.camera.IWebcamDriver;
+import webcam.IWebcamDriver;
 
-public class WebcamDriverFirei implements IWebcamDriver {
+public class CameraDriverFirei implements IWebcamDriver {
 	
 	public enum CameraControl {
 		BRIGHTNESS, EXPOSURE, SHARPNESS, UB, VR, HUE, SATURATION, GAMMA, SHUTTER, 
@@ -14,7 +14,7 @@ public class WebcamDriverFirei implements IWebcamDriver {
 	}
 	
 	
-	public WebcamDriverFirei() {
+	public CameraDriverFirei() {
 		controlBlock = DirectBufferUtils.allocateIntBuffer(2);
 	}
 	
