@@ -8,7 +8,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jmf.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java_util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/HandTrackingPro"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Common"/>
 	<classpathentry kind="output" path="bin"/>

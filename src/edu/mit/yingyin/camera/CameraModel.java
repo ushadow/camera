@@ -80,6 +80,8 @@ public class CameraModel {
 			driverFirei.setProperty(CameraDriverFirei.CameraControl.GAIN, 0); //180
 			driverFirei.setProperty(CameraDriverFirei.CameraControl.EXPOSURE, 255); //297
 		}
+		
+		bi = new BufferedImage(640, 480, BufferedImage.TYPE_INT_ARGB);
 	}
 	
 	public ICameraDriver getDriver() { return driver; }
@@ -124,7 +126,7 @@ public class CameraModel {
 				while (captureStarted) {
 					try {
 						long startTime = System.nanoTime();
-						bi = driver.captureNow();
+						driver.captureNow(bi);
 						long elapsed = System.nanoTime() - startTime;
 						totalElapsed += elapsed;
 						totalFrames++;

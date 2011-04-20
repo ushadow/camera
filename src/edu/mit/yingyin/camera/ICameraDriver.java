@@ -9,7 +9,7 @@ public interface ICameraDriver {
 	
 	public abstract void initialize(int camera); 
 
-	public abstract BufferedImage captureNow();
+	public abstract void captureNow(BufferedImage image);
 
 	public abstract void cleanUp();
 	

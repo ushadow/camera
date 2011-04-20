@@ -21,10 +21,9 @@ import javax.swing.KeyStroke;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 
-import yingyin.common.EnvConstants;
 import edu.mit.yingyin.camera.CameraDriverFirefly;
 import edu.mit.yingyin.camera.CameraDriverFirei;
-import edu.mit.yingyin.camera.CameraEmulator;
+import edu.mit.yingyin.camera.CameraDriverEmulator;
 import edu.mit.yingyin.camera.CameraModel;
 import edu.mit.yingyin.camera.ICameraDriver;
 import edu.mit.yingyin.gui.StatusBar;
@@ -39,7 +38,7 @@ public class CameraView extends JFrame implements WindowListener, KeyListener {
 
   static {
     Option saveDirOption = OptionBuilder.withLongOpt("save-dir").hasArg().
-    create();
+        create();
     Option imagePrefixOption = OptionBuilder.withLongOpt("image-prefix").
         hasArg().create();
     Option imageTypeOption = OptionBuilder.withLongOpt("image-type").hasArg().
@@ -86,7 +85,7 @@ public class CameraView extends JFrame implements WindowListener, KeyListener {
 	protected StatusBar sb = null;
 	
 	private int imageIndex = 1;
-	private String lastAccessedDir = EnvConstants.MAIN_FOLDER;
+	private String lastAccessedDir = "./";
 
 	/**
 	 * Create an instance of main frame for displaying image frame captured from 
@@ -274,7 +273,8 @@ public class CameraView extends JFrame implements WindowListener, KeyListener {
 	  String cameraType = CameraView.getCameraType();
 	  ICameraDriver driver = null;
 	  if (cameraType.equals("emulator"))
-	    driver = new CameraEmulator();
+	    driver = new CameraDriverEmulator(
+	        CommandLineOptions.getOptionValue("record-dir", "./"));
 	  else if (cameraType.equals("firefly"))
 	    driver = new CameraDriverFirefly(false);
 		CameraView wv = new CameraView("Webcam", new CameraModel(driver));

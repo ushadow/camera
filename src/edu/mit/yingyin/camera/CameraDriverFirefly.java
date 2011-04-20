@@ -28,15 +28,12 @@ public class CameraDriverFirefly implements ICameraDriver {
   
   private IntBuffer controlBlock;
   private IntBuffer imageBuf;
-  private BufferedImage image;
   private int[] rgbArray;
   private boolean useTrigger;
   
   public CameraDriverFirefly(boolean useTrigger) {
     controlBlock = DirectBufferUtils.allocateIntBuffer(2);
     imageBuf = DirectBufferUtils.allocateIntBuffer(getWidth() * getHeight());
-    image = new BufferedImage(getWidth(), getHeight(), 
-                              BufferedImage.TYPE_INT_ARGB);
     rgbArray = new int[imageBuf.capacity()];
     this.useTrigger = useTrigger;
   }
@@ -48,14 +45,13 @@ public class CameraDriverFirefly implements ICameraDriver {
   }
 
   // Captures a new image until there is an external trigger.
-  public BufferedImage captureNow() {
+  public void captureNow(BufferedImage image) {
     captureNow(controlBlock, imageBuf, getWidth(), getHeight());
     imageBuf.rewind();
     imageBuf.get(rgbArray);
     int[] dstArray = ((DataBufferInt) image.getRaster().getDataBuffer()).
                      getData();
     System.arraycopy(rgbArray, 0, dstArray, 0, rgbArray.length);
-    return image;
   }
 
   public void cleanUp() {

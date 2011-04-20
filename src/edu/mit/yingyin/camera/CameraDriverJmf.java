@@ -1,7 +1,8 @@
 package edu.mit.yingyin.camera;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.IOException;
-import java.nio.IntBuffer;
 import java.util.Vector;
 
 import javax.media.Buffer;
@@ -18,14 +19,12 @@ import javax.media.control.FrameGrabbingControl;
 import javax.media.control.FrameRateControl;
 import javax.media.format.VideoFormat;
 
-import rywang.util.DirectBufferUtils;
-import webcam.IWebcamDriver;
 /**
  * WebcamDriverJmf is a driver for webcams using java media framework
  * @author Ying
  *
  */
-public class CameraDriverJmf implements IWebcamDriver {
+public class CameraDriverJmf implements ICameraDriver {
 	
 	/* Constants */
 	private static final String CAPTURE_FORMAT = VideoFormat.RGB;
@@ -39,14 +38,12 @@ public class CameraDriverJmf implements IWebcamDriver {
 	private FormatControl fc = null;
 	private static Player player = null;
 	private FrameGrabbingControl fgc = null;
+	private int[] rgbArray;
 	
-	public CameraDriverJmf() {}
-	
-	@Override
-	public IntBuffer allocateImageBuffer() {
-		return DirectBufferUtils.allocateIntBuffer(getWidth() * getHeight());
+	public CameraDriverJmf() {
+	  rgbArray = new int[getWidth() * getHeight()];
 	}
-
+	
 	/**
 	 * The capture an image frame and store the image in IntBuffer. For each int in the IntBuffer, the least 
 	 * significant byte is green, the second byte is blue, and the third byte is red. If the 
@@ -58,33 +55,30 @@ public class CameraDriverJmf implements IWebcamDriver {
 	 * @param height of the image
 	 */
 	@Override
-	public void captureNow(IntBuffer image, int width, int height) {
+	public void captureNow(BufferedImage image) {
 	      
-	      Buffer buf = fgc.grabFrame();
-	      Object o = buf.getData();
-	      if(o instanceof byte[])
-	      {
-	    	  byte[] ba = (byte[])o;
-	    	  
-	    	  if(ba.length>=width*height*3)
-	    	  {
-	    		  image.clear();
-	    		  for(int h = 0 ; h<height; h++)
-		    		  for(int w = 0; w<width; w++)
-		    		  {
-		    			  int index = h * width + w;
-		    			  int ibIndex = height * width -1 -index;
-		    			  int baIndex = index * 3;
-		    			  int argb = (ba[baIndex] & 0xff) | ((ba[baIndex+1] & 0xff)<<8) | ((ba[baIndex+2] & 0xff)<<16) | 0xff000000;
-		    			  image.put(ibIndex, argb);
-		    		  }
-	    	  }
-	      }   
-	}
-
-	@Override
-	public void captureNow(IntBuffer image) {
-		captureNow(image, getWidth(), getHeight());
+	  int width = getWidth();
+	  int height = getHeight();
+    Buffer buf = fgc.grabFrame();
+    Object o = buf.getData();
+    if(o instanceof byte[]) {
+  	  byte[] ba = (byte[])o;
+  	  
+  	  if(ba.length >= width * height * 3) {
+  		  for(int h = 0 ; h < height; h++)
+    		  for(int w = 0; w < width; w++) {
+    			  int index = h * width + w;
+    			  int ibIndex = height * width - 1 - index;
+    			  int baIndex = index * 3;
+    			  rgbArray[ibIndex] = (ba[baIndex] & 0xff) | 
+    			                      ((ba[baIndex + 1] & 0xff) << 8) | 
+    			                      ((ba[baIndex + 2] & 0xff) << 16) | 0xff000000;
+    		  }
+  		  int[] dstArray = ((DataBufferInt)image.getRaster().getDataBuffer()).
+  		      getData();
+  		  System.arraycopy(rgbArray, 0, dstArray, 0, rgbArray.length);
+  	  }
+    }   
 	}
 
 	@Override
@@ -109,19 +103,18 @@ public class CameraDriverJmf implements IWebcamDriver {
 
 		Vector deviceList = CaptureDeviceManager.getDeviceList(new VideoFormat(CAPTURE_FORMAT) );
 
-		if(deviceList.size()>camera)
+		if(deviceList.size() > camera) {
 			device = (CaptureDeviceInfo) deviceList.elementAt(camera);
-		else 
-		{
+		} else {
 			System.err.println("WebcamDriverJmf::initialize: No device for camera " + camera);
 			System.exit(1);
 		}
         
-        ml = device.getLocator();
-        
-        System.out.println("Media Locator: " + ml.toString());
+    ml = device.getLocator();
     
-        try {
+    System.out.println("Media Locator: " + ml.toString());
+
+    try {
 			player = Manager.createRealizedPlayer(ml);
 
 			fc = (FormatControl)player.getControl("javax.media.control.FormatControl");
@@ -139,7 +132,6 @@ public class CameraDriverJmf implements IWebcamDriver {
 			player.start();
 			
 			fgc = (FrameGrabbingControl)player.getControl("javax.media.control.FrameGrabbingControl");
-			
 		} catch (NoPlayerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -150,6 +142,5 @@ public class CameraDriverJmf implements IWebcamDriver {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-          
 	}
 }
