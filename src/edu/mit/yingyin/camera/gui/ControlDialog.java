@@ -1,4 +1,4 @@
-package yingyin.webcam.gui;
+package edu.mit.yingyin.camera.gui;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;

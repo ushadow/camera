@@ -3,10 +3,12 @@
 #include "FireiDriver.h"
 
 /*******************************************************************************************
+ * The SDK used is FireAPI 1394a/1394b development toolkit, evaluation (demo) version 5.63.
+ *
+ * To compile the code, you need to install Unibrain FireAPI5.63(Oct2009) and specify the 
+ * additional include and lib directories: Unibrain\FireAPI5.63(Oct2009)\src\include and 
+ * Unibrain\FireAPI5.63(Oct2009)\src\lib.
  * 
- * The SDK used is FireAPI 1394a/1394b development toolkit, evaluation (demo) version 5.62.
- * 2/12/2010 after changing to a new camera with the same model, the SDK is updated to 5.63. The dll
- * and lib libraries and the header files are updated.
  * 
  * This code references the sample code in 
  * "Unibrain\Fire-i API 5.60 (Dec 2008)\Samples\IIDC\DropedFrames"

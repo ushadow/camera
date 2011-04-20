@@ -11,8 +11,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.imageio.ImageIO;
 
+import edu.mit.yingyin.camera.gui.CameraView;
+
 import rywang.util.awt.BufferedImageUtils;
-import yingyin.webcam.gui.CameraView;
 
 public class CameraModel {
   

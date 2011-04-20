@@ -2,154 +2,202 @@
 #include <stdlib.h>
 
 #include "firefly_driver.h"
-#include "pgrflycapture.h"
+#include "FlyCapture2.h"
 
-// Register definitions.
-#define INITIALIZE         0x000
-#define TRIGGER_INQ        0x530
-#define CAMERA_POWER       0x610
-#define SOFTWARE_TRIGGER   0x62C
-#define SOFT_ASYNC_TRIGGER 0x102C
+/**
+ * This is a wrapper around Point Grey Research's FlyCapture2 API. 
+ * 
+ * To compile, you need to specify additional include and lib directories:
+ * Point Grey Research\FlyCapture2\include and Point Grey Research\FlyCapture2\lib.
+ */
 
-void FireflyDriver::InitializeCamera(int cameraIndex, int frameRate, bool useTrigger) {
+void FireflyDriver::InitializeCamera(int cameraIndex, int frame_rate, 
+                                     bool user_trigger) {
+  using FlyCapture2::PGRERROR_OK;
   // Enumerate the cameras on the bus.
-  FlyCaptureError error;
+  FlyCapture2::Error error;
 
-#ifdef VERBOSE
-  FlyCaptureInfoEx  arInfo[kMaxCams];
-  unsigned int  uiSize = kMaxCams;
-
-  error = flycaptureBusEnumerateCamerasEx(arInfo, &uiSize);
-  HandleError("flycaptureBusEnumerateCameras()", error);
-
-  for (unsigned int uiBusIndex = 0; uiBusIndex < uiSize; uiBusIndex++) {
-    FlyCaptureInfoEx* pinfo = &arInfo[uiBusIndex];
-    printf( 
-      "Index %u: %s (%u)\n",
-      uiBusIndex,
-      pinfo->pszModelName,
-      pinfo->SerialNumber);
+  FlyCapture2::BusManager busMgr;
+  unsigned int numCameras;
+  error = busMgr.GetNumOfCameras(&numCameras);
+  if (error != PGRERROR_OK) {
+    PrintError( error );
+    exit(-1);
   }
-#endif
+
+  printf("Number of cameras detected: %u\n", numCameras);
+
+  if ((int)numCameras < cameraIndex + 1) {
+    printf("Insufficient number of cameras... exiting\n");
+    exit(-1);
+  }
   
-  // Create the context.
-  error = flycaptureCreateContext(&context_);
-  HandleError("flycaptureCreateContext()", error);
-
-	// Initialize the camera.
-  printf("Initializing camera %u.\n", cameraIndex);
-  error = flycaptureInitialize(context_, cameraIndex);
-  HandleError("flycaptureInitialize()", error);
-
-  // Determine whether or not the camera supports external trigger mode.
-  // If it does, put the camera into external trigger mode and otherwise 
-  // exit.
-  bool bTriggerPresent;
-
-  error = flycaptureQueryTrigger( 
-    context_, &bTriggerPresent, NULL, NULL, NULL, NULL, NULL, NULL, NULL );
-  HandleError("flycaptureQueryTrigger()", error);
-
-  if (!bTriggerPresent) {
-    printf("This camera does not support external trigger... exiting\n");
-    return;
+  FlyCapture2::PGRGuid guid;
+  error = busMgr.GetCameraFromIndex(cameraIndex, &guid);
+  if (error != PGRERROR_OK) {
+    PrintError(error);
+    exit(-1);
   }
 
-  int iPolarity;
-  int iSource;
-  int iRawValue;
-  int iMode;
+  // Connect to a camera
+  error = camera_.Connect(&guid);
+  if (error != PGRERROR_OK) {
+    PrintError(error);
+    exit(-1);
+  }
+  
+  // Get the camera information
+  FlyCapture2::CameraInfo camInfo;
+  error = camera_.GetCameraInfo(&camInfo);
+  if (error != PGRERROR_OK) {
+    PrintError(error);
+    exit(-1);
+  }
 
-  if (useTrigger) {
-    error = flycaptureGetTrigger( 
-      context_, NULL, &iPolarity, &iSource, &iRawValue, &iMode, NULL );
-    HandleError( "flycaptureGetTrigger()", error );
+  PrintCameraInfo(&camInfo);  
 
+  FlyCapture2::FrameRate rate;
+  switch (frame_rate) {
+    case 30:
+      rate = FlyCapture2::FRAMERATE_30;
+      break;
+    case 60:
+      rate = FlyCapture2::FRAMERATE_60;
+      break;
+    default:
+      rate = FlyCapture2::FRAMERATE_30;
+      break;
+  }
+  
+  camera_.SetVideoModeAndFrameRate(FlyCapture2::VIDEOMODE_640x480Y8, rate); 
+  
+  // Get current trigger settings
+  error = camera_.GetTriggerMode(&trigger_mode_);
+  if (error != PGRERROR_OK) {
+      PrintError( error );
+      exit(-1);
+  }
+  if (user_trigger) {
+#ifndef SOFTWARE_TRIGGER_CAMERA
+    // Determine whether or not the camera supports external trigger mode.
+    // If it does, put the camera into external trigger mode and otherwise 
+    // exit.
+    FlyCapture2::TriggerModeInfo trigger_mode_info;
+    error = camera_.GetTriggerModeInfo(&trigger_mode_info);
+    if (error != PGRERROR_OK){
+      PrintError( error );
+      exit(-1);
+    }
+
+    if (trigger_mode_info.present != true) {
+      printf("Camera does not support external trigger! Exiting...\n");
+      exit(-1);
+    }
+#endif
+    // Set camera to trigger mode 0
+    trigger_mode_.onOff = true;
+    trigger_mode_.mode = 0;
+    trigger_mode_.parameter = 0;
+
+#ifdef SOFTWARE_TRIGGER_CAMERA
+    // A source of 7 means software trigger
+    trigger_mode_.source = 7;
+#else
+    // Triggering the camera externally using source 0.
+    trigger_mode_.source = 0;
+#endif
+
+    error = camera_.SetTriggerMode(&trigger_mode_);
+    if (error != PGRERROR_OK) {
+      PrintError( error );
+      exit(-1);
+    }
     printf( "Going into asynchronous Trigger_Mode_0.\n" );
-
-    // Ensure the camera is in Trigger Mode 0 by explicitly setting it, 
-    // as the camera could have a different default trigger mode.
-    // We are triggering the camera using an external hardware trigger.
-    error = flycaptureSetTrigger( 
-      context_, true, iPolarity, iSource, 0, 0 );
-    HandleError("flycaptureSetCameraTrigger()", error);
-
+    
     // Poll the camera to make sure the camera is actually in trigger mode
     // before we start it (avoids timeouts due to the trigger not being armed)
-    CheckTriggerReady();
-  }
+    bool retVal = CheckTriggerReady();
+    if (!retVal) {
+      printf("\nError polling for trigger ready!\n");
+		  exit(-1);
+	  }
 
-  // Start the camera and grab any excess images that are already in the pipe.
-  // Although it is extremely rare for spurious images to occur, it is
-  // possible for the grab call to return an image that is not a result of a
-  // user-generated trigger. To grab excess images, set a zero-length timeout.
-  // A value of zero makes the grab call non-blocking.
-  printf( "Checking for any buffered images..." );
-  error = flycaptureSetGrabTimeoutEx(context_, 0);
-  HandleError("flycaptureSetGrabTimeoutEx()", error);
+    // Get the camera configuration
+    FlyCapture2::FC2Config config;
+    error = camera_.GetConfiguration(&config);
+    if (error != PGRERROR_OK) {
+      PrintError( error );
+      exit(-1);
+    } 
     
-  error = flycaptureStart(
-    context_, FLYCAPTURE_VIDEOMODE_ANY, FLYCAPTURE_FRAMERATE_ANY);
-  HandleError("flycaptureStart()", error);
+    config.grabTimeout = FlyCapture2::TIMEOUT_INFINITE;
 
-  // Grab the image immediately whether or not trigger present
-  FlyCaptureImage  image;
-  error = flycaptureGrabImage2(context_, &image);
-  if( error == FLYCAPTURE_OK ) {
-    printf( "buffered image found. Flush successful.\n" );
-  } else if( error == FLYCAPTURE_TIMEOUT ) {
-    printf( "no flush required! (normal behaviour)\n" );
-  } else {
-    HandleError( "flycaptureGrabImage2()", error );
+    // Set the camera configuration
+    error = camera_.SetConfiguration(&config);
+    if (error != PGRERROR_OK) {
+      PrintError( error );
+      exit(-1);
+    }
+#ifdef SOFTWARE_TRIGGER_CAMERA
+	if (!CheckSoftwareTriggerPresence()) {
+		printf( "SOFT_ASYNC_TRIGGER not implemented on this camera!  Stopping application\n");
+		return -1;
+	}
+#else	
+	printf( "Trigger the camera by sending a trigger pulse to GPIO%d.\n", 
+      trigger_mode_.source );
+#endif
   }
 
-  error = flycaptureStop(context_);
-  HandleError("flycaptureStop()", error);
+  // Camera is ready, start capturing images
+  error = camera_.StartCapture();
+  if (error != PGRERROR_OK) {
+    PrintError( error );
+    exit(-1);
+  }   
+}
 
-  // Start camera.  This is done after setting the trigger so that
-  // excess images isochronously streamed from the camera don't fill up 
-  // the internal buffers.
-  FlyCaptureFrameRate rate;
-  switch (frameRate) {
-    case 60:
-      rate = FLYCAPTURE_FRAMERATE_60;
-      break;
-    case 30:
-    default:
-      rate = FLYCAPTURE_FRAMERATE_30;
-      break;
+bool FireflyDriver::FireSoftwareTrigger() {
+  const unsigned int k_softwareTrigger = 0x62C;
+  const unsigned int k_fireVal = 0x80000000;
+  FlyCapture2::Error error;    
+
+  error = camera_.WriteRegister(k_softwareTrigger, k_fireVal);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    PrintError( error );
+    return false;
   }
-  error = flycaptureStart( 
-    context_, FLYCAPTURE_VIDEOMODE_640x480Y8, FLYCAPTURE_FRAMERATE_30);
-  HandleError("flycaptureStart()", error);
-  printf( "Camera started.\n" );
 
-  // Set the grab timeout to be infinite so that calls to flycaptureGrabImage2 will never return 
-  // until the next trigger.
-  error = flycaptureSetGrabTimeoutEx(context_, FLYCAPTURE_INFINITE);
-  HandleError("flycaptureSetGrabTimeoutEx()", error);
-  fflush(stdout);
+  return true;
 }
 
 void FireflyDriver::CaptureNow(unsigned char *pimageBGRU32, int width, int height) {
-  FlyCaptureImage image;
-  FlyCaptureError error;
-	// Initialize the image structure to sane values
-	image.iCols = 0;
-	image.iRows = 0;
+  using FlyCapture2::PGRERROR_OK;
+  FlyCapture2::Error error;
+  FlyCapture2::Image image, converted_image;
 
-	error = flycaptureGrabImage2(context_, &image);
-  HandleError("flycaptureGrabImage2()", error);
+#ifdef SOFTWARE_TRIGGER_CAMERA
+	// Check that the trigger is ready
+	CheckTriggerReady();
 
-	// Convert the last image to BGRU32.
-	FlyCaptureImage imageConverted;
-  imageConverted.pData = pimageBGRU32;
-  imageConverted.pixelFormat = FLYCAPTURE_BGRU;
+  // Fire software trigger
+  bool retVal = FireSoftwareTrigger();
+  if (!retVal) {
+    printf("\nError firing software trigger!\n");
+    exit(-1);        
+	}
+#endif
 
-  //printf( "Converting last image.\n" );
-  error = flycaptureConvertImage(context_, &image, &imageConverted);
-  HandleError("flycaptureConvertImage()", error);
-
+  // Grab image        
+	error = camera_.RetrieveBuffer(&image);
+  if (error != PGRERROR_OK) {
+    PrintError(error);
+    return;
+  }
+  
+  converted_image.SetData(pimageBGRU32, width * height * 4);
+  error = image.Convert(FlyCapture2::PIXEL_FORMAT_BGRU, &converted_image);
+  
   int index = 3;
   for (int h = 0; h < height; h++)
     for (int w = 0; w < width; w++) {
@@ -161,112 +209,184 @@ void FireflyDriver::CaptureNow(unsigned char *pimageBGRU32, int width, int heigh
 }
 
 void FireflyDriver::Cleanup() {
-  FlyCaptureError error;
-  error = flycaptureStop(context_);
-  HandleError("flycaptureStop()", error);
-	error = flycaptureDestroyContext(context_);
-	HandleError("flycaptureBusEnumerateCameras()", error);
+  using FlyCapture2::PGRERROR_OK;
+  FlyCapture2::Error error;
+  // Turn trigger mode off.
+  trigger_mode_.onOff = false;    
+  error = camera_.SetTriggerMode(&trigger_mode_);
+  if (error != PGRERROR_OK) {
+    PrintError(error);
+    exit(-1);
+  }
 
-#ifdef VERBOSE
-	printf("Done!\n");
-	fflush(stdout);
-#endif
+  // Stop capturing images
+  error = camera_.StopCapture();
+  if (error != PGRERROR_OK) {
+    PrintError( error );
+    exit(-1);
+  }      
+
+  // Disconnect the camera
+  error = camera_.Disconnect();
+  if (error != PGRERROR_OK) {
+    PrintError( error );
+    exit(-1);
+  }
 }
 
+bool FireflyDriver::CheckTriggerReady() {
+  using FlyCapture2::PGRERROR_OK;
+  const unsigned int k_softwareTrigger = 0x62C;
+  FlyCapture2::Error error;
+  unsigned int regVal = 0;
 
-FlyCaptureError FireflyDriver::CheckTriggerReady() {
-  FlyCaptureError  error;
-  unsigned long  ulValue;
+  do {
+    error = camera_.ReadRegister(k_softwareTrigger, &regVal);
+    if (error != PGRERROR_OK) {
+      PrintError( error );
+		  return false;
+    }
+  } while ((regVal >> 31) != 0);
 
-  // Do our check to make sure the camera is ready to be triggered
-  // by looking at bits 30-31. Any value other than 1 indicates
-  // the camera is not ready to be triggered.
-  error = flycaptureGetCameraRegister(context_, SOFT_ASYNC_TRIGGER, &ulValue);
-  HandleError("flycaptureGetCameraRegister()", error);
-
-  while( ulValue != 0x80000001 ) {
-    error = flycaptureGetCameraRegister(context_, SOFT_ASYNC_TRIGGER, &ulValue);
-    HandleError( "flycaptureGetCameraRegister()", error );
-  }
-  return FLYCAPTURE_OK;
+	return true;
 }
 
 // static
-void FireflyDriver::listCameras(std::vector<std::string>& drivers) {
-  FlyCaptureInfoEx  arInfo[kMaxCams];
-  unsigned int  uiSize = kMaxCams;
+void FireflyDriver::ListCameras(std::vector<std::string>& drivers) {
+  using FlyCapture2::PGRERROR_OK;
+  FlyCapture2::Error error;
+  FlyCapture2::PGRGuid guid;
+  FlyCapture2::Camera camera;
+  FlyCapture2::BusManager busMgr;
+  FlyCapture2::CameraInfo camInfo;
+  unsigned int numCameras;
+  error = busMgr.GetNumOfCameras(&numCameras);
+  if (error != PGRERROR_OK) {
+    PrintError( error );
+    exit(-1);
+  }
 
-  FlyCaptureError error;
-
-  error = flycaptureBusEnumerateCamerasEx(arInfo, &uiSize);
-  HandleError("flycaptureBusEnumerateCameras()", error);
-
-  for (unsigned int uiBusIndex = 0; uiBusIndex < uiSize; uiBusIndex++) {
-    FlyCaptureInfoEx* pinfo = &arInfo[uiBusIndex];
-    /*
-    printf( 
-      "Index %u: %s (%u)\n",
-      uiBusIndex,
-      pinfo->pszModelName,
-      pinfo->SerialNumber);
-      */
-    drivers.push_back(pinfo->pszModelName);
+  for (unsigned int uiBusIndex = 0; uiBusIndex < numCameras; uiBusIndex++) {
+    error = busMgr.GetCameraFromIndex(uiBusIndex, &guid);
+    if (error != PGRERROR_OK) {
+      PrintError(error);
+      exit(-1);
+    }
+    // Connect to a camera
+    error = camera.Connect(&guid);
+    if (error != PGRERROR_OK) {
+      PrintError(error);
+      exit(-1);
+    }
+    
+    // Get the camera information
+    error = camera.GetCameraInfo(&camInfo);
+    if (error != PGRERROR_OK) {
+      PrintError(error);
+      exit(-1);
+    }
+    drivers.push_back(camInfo.modelName);
   }
 }
 
-void FireflyDriver::maximizeGain() {
-  bool present, automatic, manual;
-  long minValue, maxValue, defaultValue;
-
+void FireflyDriver::MaximizeGain() {
   // set the gain to max
-  flycaptureGetCameraPropertyRange(context_, FLYCAPTURE_GAIN, &present, 
-    &minValue, &maxValue, &defaultValue, &automatic, &manual);
-
-  flycaptureSetCameraProperty(context_, FLYCAPTURE_GAIN, maxValue, maxValue, false);
+  FlyCapture2::PropertyInfo info;
+  FlyCapture2::Property camera_property;
+  info.type = FlyCapture2::GAIN;
+  camera_property.type = FlyCapture2::GAIN;
+  camera_.GetPropertyInfo(&info);
+  camera_.GetProperty(&camera_property);
+  camera_property.valueA = camera_property.valueB = info.max;
+  camera_property.absControl = false;
+  camera_property.autoManualMode = false;
+  
+  camera_.SetProperty(&camera_property);
 
 }
 
-void FireflyDriver::increaseExposure() {
-  bool present, automatic, manual;
-  long minValue, maxValue, defaultValue;
+void FireflyDriver::IncreaseShutter() {
+  MaximizeGain();
+  ChangeCameraProperty(FlyCapture2::SHUTTER, 1);
+}
 
-  long valueA;
-  long valueB;
-  bool isAuto;
+void FireflyDriver::DecreaseShutter() {
+  MaximizeGain();
+  ChangeCameraProperty(FlyCapture2::SHUTTER, -1);
+}
 
-  maximizeGain();
+void FireflyDriver::IncreaseSaturation() {
+  ChangeCameraProperty(FlyCapture2::SATURATION, 1);
+}
 
-  flycaptureGetCameraPropertyRange(context_, FLYCAPTURE_SHUTTER, &present, 
-    &minValue, &maxValue, &defaultValue, &automatic, &manual);
+void FireflyDriver::DecreaseSaturation() {
+  ChangeCameraProperty(FlyCapture2::SATURATION, -1);
+}
 
-  // get the current value
-  flycaptureGetCameraProperty(context_, FLYCAPTURE_SHUTTER, &valueA, &valueB, &isAuto);
-  long newValue = valueA + kShutterIncrement;
-  newValue = (newValue < maxValue) ? newValue : maxValue;
-  flycaptureSetCameraProperty(context_, FLYCAPTURE_SHUTTER, newValue, newValue, false);
-  printf("Set exposure to: %d in range %d %d\n", newValue, minValue, maxValue);
+void FireflyDriver::ChangeCameraProperty(FlyCapture2::PropertyType type, int direction) {
+  FlyCapture2::PropertyInfo info;
+  FlyCapture2::Property camera_property;
+  info.type = type;
+  camera_property.type = type;
+  camera_.GetPropertyInfo(&info);
+  if (!info.present) {
+    printf("%d control is not supported.\n", type);
+    return;
+  }
+  camera_.GetProperty(&camera_property);
+  unsigned long new_value = camera_property.valueA + kPropertyIncrement * direction;
+  new_value = (new_value < info.max) ? new_value : info.max;
+  new_value = (new_value > info.min) ? new_value : info.min;
+  camera_property.valueA = camera_property.valueB = new_value;
+  camera_property.absControl = false;
+  camera_property.autoManualMode = false;
+  
+  camera_.SetProperty(&camera_property);
+  printf("Set %d to: %d in range %d %d\n", type, new_value, info.min, info.max);
 
   fflush(stdout);
 }
 
-void FireflyDriver::decreaseExposure() {
-  bool present, automatic, manual;
-  long minValue, maxValue, defaultValue;
+bool FireflyDriver::CheckSoftwareTriggerPresence() {
+  using FlyCapture2::PGRERROR_OK;
+  const unsigned int k_triggerInq = 0x530;
 
-  maximizeGain();
+	FlyCapture2::Error error;
+	unsigned int regVal = 0;
 
-  long valueA;
-  long valueB;
-  bool isAuto;
+	error = camera_.ReadRegister(k_triggerInq, &regVal);
 
-  flycaptureGetCameraPropertyRange(context_, FLYCAPTURE_SHUTTER, &present, 
-    &minValue, &maxValue, &defaultValue, &automatic, &manual);
+	if (error != PGRERROR_OK) {
+		PrintError( error );
+		return false;
+	}
 
-  // get the current value
-  flycaptureGetCameraProperty(context_, FLYCAPTURE_SHUTTER, &valueA, &valueB, &isAuto);
-  long newValue = valueA - kShutterIncrement;
-  newValue = (newValue > minValue) ? newValue : minValue;
-  flycaptureSetCameraProperty(context_, FLYCAPTURE_SHUTTER, newValue, newValue, false);
-  printf("Set exposure to: %d in range %d %d\n", newValue, minValue, maxValue);
-  fflush(stdout);
+	if(( regVal & 0x10000 ) != 0x10000) {
+		return false;
+	}
+	return true;
+}
+
+// Helper code to handle a FlyCapture error.
+void FireflyDriver::PrintError(FlyCapture2::Error error) {
+	error.PrintErrorTrace();
+}
+
+void FireflyDriver::PrintCameraInfo(FlyCapture2::CameraInfo* pCamInfo) {
+  printf(
+      "\n*** CAMERA INFORMATION ***\n"
+      "Serial number - %u\n"
+      "Camera model - %s\n"
+      "Camera vendor - %s\n"
+      "Sensor - %s\n"
+      "Resolution - %s\n"
+      "Firmware version - %s\n"
+      "Firmware build time - %s\n\n",
+      pCamInfo->serialNumber,
+      pCamInfo->modelName,
+      pCamInfo->vendorName,
+      pCamInfo->sensorInfo,
+      pCamInfo->sensorResolution,
+      pCamInfo->firmwareVersion,
+      pCamInfo->firmwareBuildTime);
 }

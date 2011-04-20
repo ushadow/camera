@@ -1,46 +1,45 @@
-// A wrapper around Point Grey Research's FlyCapture API (v1.0.0.13) for
+// A wrapper around Point Grey Research's FlyCapture2.1 API for
 // capturing images through external triggering.
-// The camera starts with the external trigger mode 0. The other controls of the camera
-// is not exposed yet.
+// If user_trigger is true, the camera starts with the external trigger mode 0. 
+// The exposed controls of the camera are: shutter, and saturation.
 #ifndef _H_FIREFLY_DRIVER_
 #define _H_FIREFLY_DRIVER_
 
 #include <string>
 #include <vector>
 
-#include "pgrflycapture.h"
+#include "FlyCapture2.h"
 
 class FireflyDriver {
 public:
-  FireflyDriver() {};
+  static void ListCameras(std::vector<std::string>& drivers);
   
-  void InitializeCamera(int cameraIndex, int frameRate, bool useTrigger);
-
+  FireflyDriver() {};
+  // Initializes the camera at the given index, with given frame_rate.
+  // Turns triggering mode on if use_trigger is true.
+  void InitializeCamera(int index, int frame_rate, bool use_trigger);
   void Cleanup();
   void CaptureNow(unsigned char* pimageBGRA32, int width, int height);
-
-  static void listCameras(std::vector<std::string>& drivers);
-
-  void increaseExposure();
-  void decreaseExposure();
+  void IncreaseShutter();
+  void DecreaseShutter();
+  void IncreaseSaturation();
+  void DecreaseSaturation();
 
 private:
-  void maximizeGain();
-
   static const int kMaxCams = 5;
-  static const int kShutterIncrement = 4;
+  static const int kPropertyIncrement = 4;
+  static void PrintError(FlyCapture2::Error error);
 
-  FlyCaptureContext	context_;
-  FlyCaptureError CheckTriggerReady();
+  FlyCapture2::Camera camera_;
+  FlyCapture2::TriggerMode trigger_mode_;
+
+  bool CheckTriggerReady();
+  void MaximizeGain();
+  void PrintCameraInfo(FlyCapture2::CameraInfo* pCamInfo);
+  bool FireSoftwareTrigger();
+  bool CheckSoftwareTriggerPresence();
+  void ChangeCameraProperty(FlyCapture2::PropertyType type, int direction);
 };
-
-// Helper code to handle a FlyCapture error.
-inline void HandleError(std::string function, FlyCaptureError error) {
-	if (error != FLYCAPTURE_OK) { 
-   printf( "%s: %s\n", function, flycaptureErrorToString(error)); 
-   exit(1); 
-  }
-}
 
 #endif
 

@@ -3,8 +3,8 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="pointgrey_trigger"
-	ProjectGUID="{5AEBF1D3-1E66-4BB0-82EF-7DC543C6084F}"
-	RootNamespace="pointgrey_trigger"
+	ProjectGUID="{00EC52B2-0FDE-46A9-ADF3-7BC7F2F43A6A}"
+	RootNamespace="pointgrey_trigger2"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -19,8 +19,8 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
+			ConfigurationType="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,7 +40,6 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="H:\workspace\Tabletop\camera\pointgrey_trigger\pointgrey_trigger\include"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -58,7 +57,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories="H:\workspace\Tabletop\camera\pointgrey_trigger\pointgrey_trigger\lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -111,7 +109,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="include"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Java\jdk1.6.0_24\include\win32&quot;;&quot;H:\ProgramFiles\Point Grey Research\FlyCapture2\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_24\include&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -128,10 +126,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pgrflycapture.lib"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				AdditionalDependencies="FlyCapture2.lib"
+				OutputFile="$(OutDir)\pointgrey_trigger.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="lib"
+				AdditionalLibraryDirectories="&quot;H:\ProgramFiles\Point Grey Research\FlyCapture2\lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

@@ -2,10 +2,10 @@
 #include "firefly_driver.h"
 
 JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_initialize
-    (JNIEnv *env, jobject obj, jobject cb, jint cameraIndex, jint frameRate, jboolean useTrigger) {
+    (JNIEnv *env, jobject obj, jobject cb, jint cameraIndex, jint frame_rate, jboolean user_trigger) {
 	FireflyDriver** fireflyDriver = (FireflyDriver**)env->GetDirectBufferAddress(cb);
   *fireflyDriver = new FireflyDriver();
-  (*fireflyDriver)->InitializeCamera(cameraIndex, frameRate, useTrigger == JNI_TRUE);
+  (*fireflyDriver)->InitializeCamera(cameraIndex, frame_rate, user_trigger == JNI_TRUE);
 }
 
 JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_captureNow
@@ -24,7 +24,7 @@ JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_cleanUp
 JNIEXPORT jobjectArray JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_getDeviceNames
 (JNIEnv *env, jclass obj) {
   std::vector<std::string> devices;
-  FireflyDriver::listCameras(devices);
+  FireflyDriver::ListCameras(devices);
   int numDevices = (int) devices.size();
 
   jstring str = NULL;
@@ -41,7 +41,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_g
 JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_increaseExposure
 (JNIEnv *env, jobject obj, jobject cb) {
   FireflyDriver* fireflyDriver = *((FireflyDriver**) env->GetDirectBufferAddress(cb));
-  fireflyDriver->increaseExposure();
+  fireflyDriver->IncreaseShutter();
 }
 
 /*
@@ -52,5 +52,27 @@ JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_increaseE
 JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_decreaseExposure
 (JNIEnv *env, jobject obj, jobject cb) {
   FireflyDriver* fireflyDriver = *((FireflyDriver**) env->GetDirectBufferAddress(cb));
-  fireflyDriver->decreaseExposure();
+  fireflyDriver->DecreaseShutter();
+}
+
+/*
+ * Class:     edu_mit_yingyin_camera_CameraDriverFirefly
+ * Method:    increaseSaturation
+ * Signature: (Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_increaseSaturation
+(JNIEnv *env, jobject obj, jobject cb) {
+  FireflyDriver* fireflyDriver = *((FireflyDriver**) env->GetDirectBufferAddress(cb));
+  fireflyDriver->IncreaseSaturation();
+}
+
+/*
+ * Class:     edu_mit_yingyin_camera_CameraDriverFirefly
+ * Method:    decreaseSaturation
+ * Signature: (Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_decreaseSaturation
+(JNIEnv *env, jobject obj, jobject cb) {
+  FireflyDriver* fireflyDriver = *((FireflyDriver**) env->GetDirectBufferAddress(cb));
+  fireflyDriver->DecreaseSaturation();
 }

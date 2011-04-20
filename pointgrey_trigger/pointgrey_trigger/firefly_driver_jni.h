@@ -57,6 +57,22 @@ JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_increaseE
 JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_decreaseExposure
   (JNIEnv *, jobject, jobject);
 
+/*
+ * Class:     edu_mit_yingyin_camera_CameraDriverFirefly
+ * Method:    increaseSaturation
+ * Signature: (Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_increaseSaturation
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     edu_mit_yingyin_camera_CameraDriverFirefly
+ * Method:    decreaseSaturation
+ * Signature: (Ljava/nio/IntBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_edu_mit_yingyin_camera_CameraDriverFirefly_decreaseSaturation
+  (JNIEnv *, jobject, jobject);
+
 #ifdef __cplusplus
 }
 #endif

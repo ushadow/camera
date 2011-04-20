@@ -111,7 +111,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="./Include;&quot;C:\Program Files\Java\jdk1.6.0_11\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_11\include\win32&quot;"
+				AdditionalIncludeDirectories="&quot;H:\ProgramFiles\Unibrain\FireAPI5.63(Oct2009)\src\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_11\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_11\include\win32&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -130,7 +130,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="ub1394.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="./lib"
+				AdditionalLibraryDirectories="&quot;H:\ProgramFiles\Unibrain\FireAPI5.63(Oct2009)\src\lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -181,42 +181,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\Include\1394Status.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Include\CameraRegisterDef.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Include\dbg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Include\FIREI.H"
-				>
-			</File>
-			<File
-				RelativePath=".\FireiDriver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Include\FireiEnums.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Include\FireiStatus.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Include\FireiTypes.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Include\ParameterValidation.h"
-				>
-			</File>
 			<File
 				RelativePath=".\yingyin_webcam_WebcamDriverFirei.h"
 				>

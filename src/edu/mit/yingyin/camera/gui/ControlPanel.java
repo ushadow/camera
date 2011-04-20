@@ -1,4 +1,4 @@
-package yingyin.webcam.gui;
+package edu.mit.yingyin.camera.gui;
 
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
