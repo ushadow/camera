@@ -3,16 +3,16 @@ package edu.mit.yingyin.camera;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.imageio.ImageIO;
 
-import webcam.IWebcamDriver;
+import rywang.util.awt.BufferedImageUtils;
 import yingyin.webcam.gui.CameraView;
-import edu.mit.yingyin.image.ImageConvertUtils;
 
 public class CameraModel {
   
@@ -40,26 +40,34 @@ public class CameraModel {
           e.printStackTrace();
         }
       }
-      System.out.println("Stopped continuous recording");
+      List<BufferedImage> images = new ArrayList<BufferedImage>();
+      blockingQueue.drainTo(images);
+      for (BufferedImage image : images) {
+        String fileName = String.format("%s%04d.%s", imagePrefix, index, 
+            imageType);
+        index++;         
+        try {
+          ImageIO.write(image, "PNG", new File(fileName));
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      System.out.println("Finished continuous recording");
     }
   }
-	
-	private static final int WIDTH = 640;
-	private static final int HEIGHT = 480;
 	
 	private boolean captureStarted = false;
 	private boolean continuousRecording = false;
 	
-	private IntBuffer ib;
 	private BufferedImage bi;
-	private IWebcamDriver driver = null;
+	private ICameraDriver driver = null;
 	private CameraView wv = null;
 	private Thread captureThread = null;
 	private Thread savingThread = null;
 	private BlockingQueue<BufferedImage> blockingQueue = 
 	    new LinkedBlockingQueue<BufferedImage>();
 	
-	public CameraModel(IWebcamDriver webcamDriver) {		
+	public CameraModel(ICameraDriver webcamDriver) {		
 		this.driver = webcamDriver;
 		driver.initialize(0);
 		
@@ -72,12 +80,9 @@ public class CameraModel {
 			driverFirei.setProperty(CameraDriverFirei.CameraControl.GAIN, 0); //180
 			driverFirei.setProperty(CameraDriverFirei.CameraControl.EXPOSURE, 255); //297
 		}
-	
-    ib = driver.allocateImageBuffer();
-    bi = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 	}
 	
-	public IWebcamDriver getDriver() { return driver; }
+	public ICameraDriver getDriver() { return driver; }
 	
 	/**
 	 * If the capturing thread is not started, return;
@@ -119,14 +124,13 @@ public class CameraModel {
 				while (captureStarted) {
 					try {
 						long startTime = System.nanoTime();
-						driver.captureNow(ib, WIDTH, HEIGHT);
+						bi = driver.captureNow();
 						long elapsed = System.nanoTime() - startTime;
-						ImageConvertUtils.IntBuffer2BufferedImage(ib, bi);
 						totalElapsed += elapsed;
 						totalFrames++;
 						wv.setImage(bi);	
 						if (continuousRecording)
-							blockingQueue.offer(bi);
+							blockingQueue.offer(BufferedImageUtils.fastCopy(bi));
 					} catch (Exception e) {
 					  e.printStackTrace();
 					}
@@ -191,4 +195,18 @@ public class CameraModel {
       firefly.decreaseExposure();
     }
 	}
+	
+	public void increaseSaturation() {
+    if (driver instanceof CameraDriverFirefly) {
+      CameraDriverFirefly firefly = (CameraDriverFirefly) driver;
+      firefly.increaseSaturation();
+    }
+  }
+  
+  public void decreaseSaturation() {
+    if (driver instanceof CameraDriverFirefly) {
+      CameraDriverFirefly firefly = (CameraDriverFirefly) driver;
+      firefly.decreaseSaturation();
+    }
+  }
 }

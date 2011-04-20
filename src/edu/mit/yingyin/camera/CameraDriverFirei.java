@@ -4,9 +4,8 @@ import java.nio.IntBuffer;
 import java.util.Vector;
 
 import rywang.util.DirectBufferUtils;
-import webcam.IWebcamDriver;
 
-public class CameraDriverFirei implements IWebcamDriver {
+public class CameraDriverFirei {
 	
 	public enum CameraControl {
 		BRIGHTNESS, EXPOSURE, SHARPNESS, UB, VR, HUE, SATURATION, GAMMA, SHUTTER, 
@@ -18,18 +17,15 @@ public class CameraDriverFirei implements IWebcamDriver {
 		controlBlock = DirectBufferUtils.allocateIntBuffer(2);
 	}
 	
-	@Override
 	public IntBuffer allocateImageBuffer() {
 		return DirectBufferUtils.allocateIntBuffer(getWidth() * getHeight());
 	}
 
-	@Override
 	public void captureNow(IntBuffer image, int width, int height) {
 		image.clear();
 		captureNowNative(controlBlock, image, width, height);
 	}
 
-	@Override
 	public void captureNow(IntBuffer image) {
 		captureNow(image, getWidth(), getHeight());
 	}
@@ -38,22 +34,18 @@ public class CameraDriverFirei implements IWebcamDriver {
 	 * Cleanup the context for the Firei driver. This method should be called 
 	 * after the last caputreNow has finished (returned).
 	 */
-	@Override
 	public void cleanUp() {
 		cleanUp(controlBlock);
 	}
 
-	@Override
 	public int getHeight() {
 		return 480;
 	}
 
-	@Override
 	public int getWidth() {
 		return 640;
 	}
 
-	@Override
 	public void initialize(int camera) {
 		initialize(controlBlock, camera);
 	}

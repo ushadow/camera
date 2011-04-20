@@ -18,20 +18,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
-import webcam.IWebcamDriver;
 import yingyin.common.EnvConstants;
 import edu.mit.yingyin.camera.CameraDriverFirefly;
 import edu.mit.yingyin.camera.CameraDriverFirei;
+import edu.mit.yingyin.camera.CameraEmulator;
 import edu.mit.yingyin.camera.CameraModel;
+import edu.mit.yingyin.camera.ICameraDriver;
 import edu.mit.yingyin.gui.StatusBar;
+import edu.mit.yingyin.util.CommandLineOptions;
 
 /**
  * Main frame for display webcam images. Allows saving of the image.
@@ -40,41 +37,43 @@ import edu.mit.yingyin.gui.StatusBar;
  */
 public class CameraView extends JFrame implements WindowListener, KeyListener {
 
-  public static class WebcamViewOptions {
+  static {
+    Option saveDirOption = OptionBuilder.withLongOpt("save-dir").hasArg().
+    create();
+    Option imagePrefixOption = OptionBuilder.withLongOpt("image-prefix").
+        hasArg().create();
+    Option imageTypeOption = OptionBuilder.withLongOpt("image-type").hasArg().
+        create();
+    Option cameraType = OptionBuilder.withLongOpt("camera-type").hasArg().
+        create();
+    Option recordDir = OptionBuilder.withLongOpt("record-dir").hasArg().
+    create();
+    CommandLineOptions.addOption(recordDir);
+    CommandLineOptions.addOption(saveDirOption);
+    CommandLineOptions.addOption(imagePrefixOption);
+    CommandLineOptions.addOption(imageTypeOption);
+    CommandLineOptions.addOption(cameraType);
+  }
+  
+  public static String getCameraType() {
+    return CommandLineOptions.getOptionValue("camera-type", "emulator");
+  }
+  
+  public static String getSaveDir() {
+    return CommandLineOptions.getOptionValue("save-dir", "./");
+  }  
     
-    public static String saveDir;
-    public static String imagePrefix;
-    public static String imageType;
-    
-    public static void parse(String args[]) {
-      CommandLineParser parser = new GnuParser();
-      Options options = new Options();
-      Option saveDirOption = OptionBuilder.withLongOpt("save-dir").hasArg().
-          create();
-      Option imagePrefixOption = OptionBuilder.withLongOpt("image-prefix").
-          hasArg().create();
-      Option imageTypeOption = OptionBuilder.withLongOpt("image-type").hasArg().
-          create();
-      options.addOption(saveDirOption);
-      options.addOption(imagePrefixOption);
-      options.addOption(imageTypeOption);
-      
-      CommandLine line;
-      try {
-        line = parser.parse(options, args);
-        saveDir = line.getOptionValue("save-dir", "./");
-        imagePrefix = line.getOptionValue("image-prefix", "image");
-        imageType = line.getOptionValue("image-type", "png");
-      } catch (ParseException e) {
-        e.printStackTrace();
-        System.exit(-1);
-      }
-    }
+  public static String getImagePrefix() {
+    return CommandLineOptions.getOptionValue("image-prefix", "image");
+  }
+  
+  public static String getImageType() {
+    return CommandLineOptions.getOptionValue("image-type", "png");
   }
   
 	private static final long serialVersionUID = 1L;
 	protected ImagePanel ip;
-	protected IWebcamDriver wd;
+	protected ICameraDriver wd;
 	protected CameraModel webcamModel = null;
 	
 	/*menu*/
@@ -214,10 +213,9 @@ public class CameraView extends JFrame implements WindowListener, KeyListener {
 	public void keyPressed(KeyEvent ke) {
 		switch(ke.getKeyChar()) {
 		case 'c': //continuous recording
-			webcamModel.continuousRecording(WebcamViewOptions.saveDir + "/" +
-          WebcamViewOptions.imagePrefix, WebcamViewOptions.imageType);
+			webcamModel.continuousRecording(getSaveDir() + "/" +
+          getImagePrefix(), getImageType());
 			break;
-			
 		case 'i':
 			//reset imageIndex
 			//imageIndex is initialized to the input index
@@ -233,30 +231,29 @@ public class CameraView extends JFrame implements WindowListener, KeyListener {
 				imageIndex = i;
 			}
 			break;
-			
 		case 'r':	
 			//record the current image with incremental index as the image name
-	
-			String path = String.format("%s/%s%04d.%s", WebcamViewOptions.saveDir, 
-			    WebcamViewOptions.imagePrefix, imageIndex, 
-			    WebcamViewOptions.imageType);
+			String path = String.format("%s/%s%04d.%s", getSaveDir(), 
+			                            getImagePrefix(), imageIndex, getImageType());
 			//record the current image
 			ip.saveImage(path);
 			imageIndex++;
 			break;
-		
 		case 's':
 		  webcamModel.stopRecording();
 		  break;
-		  
 		case '8':
 		  webcamModel.decreaseExposure();
 		  break;
-
 		case '9':
 		  webcamModel.increaseExposure();
 		  break;
-		  
+		case '5':
+		  webcamModel.decreaseSaturation();
+		  break;
+		case '6':
+		  webcamModel.increaseSaturation();
+		  break;
 		default:
 			break;
 		}
@@ -273,8 +270,13 @@ public class CameraView extends JFrame implements WindowListener, KeyListener {
 	}
 
 	public static void main(String[] args) {
-	  WebcamViewOptions.parse(args);
-		IWebcamDriver driver = new CameraDriverFirefly(false);
+	  CommandLineOptions.parse(args);
+	  String cameraType = CameraView.getCameraType();
+	  ICameraDriver driver = null;
+	  if (cameraType.equals("emulator"))
+	    driver = new CameraEmulator();
+	  else if (cameraType.equals("firefly"))
+	    driver = new CameraDriverFirefly(false);
 		CameraView wv = new CameraView("Webcam", new CameraModel(driver));
 		wv.showUI();
 	}

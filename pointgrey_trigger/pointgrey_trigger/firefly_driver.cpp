@@ -244,7 +244,7 @@ void FireflyDriver::increaseExposure() {
   long newValue = valueA + kShutterIncrement;
   newValue = (newValue < maxValue) ? newValue : maxValue;
   flycaptureSetCameraProperty(context_, FLYCAPTURE_SHUTTER, newValue, newValue, false);
-  printf("Set exposure to: %d in range %d %d\n", valueA, minValue, maxValue);
+  printf("Set exposure to: %d in range %d %d\n", newValue, minValue, maxValue);
 
   fflush(stdout);
 }
@@ -267,6 +267,6 @@ void FireflyDriver::decreaseExposure() {
   long newValue = valueA - kShutterIncrement;
   newValue = (newValue > minValue) ? newValue : minValue;
   flycaptureSetCameraProperty(context_, FLYCAPTURE_SHUTTER, newValue, newValue, false);
-  printf("Set exposure to: %d in range %d %d\n", valueA, minValue, maxValue);
+  printf("Set exposure to: %d in range %d %d\n", newValue, minValue, maxValue);
   fflush(stdout);
 }

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="camera">
+    <property environment="env"/>
+    <property name="Common.location" value="../Common"/>
+    <property name="ColorCalib.location" value="../ColorCalib"/>
+    <property name="Tabletop.location" value="../Tabletop"/>
+    <property name="Tabletop1.location" value="../Tabletop1"/>
+    <property name="gesture.location" value="../gesture"/>
+    <property name="ECLIPSE_HOME" value="../../../ProgramFiles/eclipse3.6/eclipse"/>
+    <property name="workspace_loc" value="../"/>
+    <property name="Skinning.location" value="../Skinning"/>
+    <property name="HandTrackingPro.location" value="../HandTrackingPro"/>
+    <property name="java_util.location" value="../java_util"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="java_util.classpath">
+        <pathelement location="${java_util.location}/bin"/>
+        <pathelement location="${java_util.location}/lib/vecmath.jar"/>
+    </path>
+    <path id="Common.classpath">
+        <pathelement location="${Common.location}/bin"/>
+        <pathelement location="${Common.location}/lib/botanical.jar"/>
+        <pathelement location="${Common.location}/lib/colt.jar"/>
+        <pathelement location="${Common.location}/lib/f2jutil.jar"/>
+        <pathelement location="${Common.location}/lib/gluegen-rt.jar"/>
+        <pathelement location="${Common.location}/lib/j3dcore.jar"/>
+        <pathelement location="${Common.location}/lib/Jama-1.0.1.jar"/>
+        <pathelement location="${Common.location}/lib/jimini.jar"/>
+        <pathelement location="${Common.location}/lib/nnls.jar"/>
+        <pathelement location="${Common.location}/lib/subdivision.jar"/>
+        <pathelement location="${Common.location}/lib/vecmath.jar"/>
+        <pathelement location="${Common.location}/lib/ledatastream15.zip"/>
+        <pathelement location="${Common.location}/lib/djames.jar"/>
+        <pathelement location="${Common.location}/lib/jchart2d-3.1.0.jar"/>
+        <pathelement location="${Common.location}/lib/jogl.jar"/>
+    </path>
+    <path id="Skinning.classpath">
+        <pathelement location="${Skinning.location}/bin"/>
+        <pathelement location="${Common.location}/lib/colt.jar"/>
+        <pathelement location="${Common.location}/lib/vecmath.jar"/>
+        <pathelement location="${Common.location}/lib/nnls.jar"/>
+        <pathelement location="${Common.location}/lib/ledatastream15.zip"/>
+        <pathelement location="${Common.location}/lib/jchart2d-2.2.1.jar"/>
+        <pathelement location="${Skinning.location}/lib/djames.jar"/>
+        <pathelement location="${Common.location}/lib/jogl.jar"/>
+        <path refid="Common.classpath"/>
+    </path>
+    <path id="HandTrackingPro.classpath">
+        <pathelement location="${HandTrackingPro.location}/bin"/>
+        <path refid="Common.classpath"/>
+        <pathelement location="${Common.location}/lib/colt.jar"/>
+        <pathelement location="${Common.location}/lib/jogl.jar"/>
+        <pathelement location="${Common.location}/lib/nnls.jar"/>
+        <pathelement location="${Common.location}/lib/vecmath.jar"/>
+        <pathelement location="${HandTrackingPro.location}/lib/jmatio.jar"/>
+        <pathelement location="${Common.location}/lib/ledatastream15.zip"/>
+        <pathelement location="${Common.location}/lib/jchart2d-3.1.0.jar"/>
+        <path refid="Skinning.classpath"/>
+    </path>
+    <path id="camera.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/jmf.jar"/>
+        <path refid="java_util.classpath"/>
+        <path refid="HandTrackingPro.classpath"/>
+        <pathelement location="lib/commons-cli-1.2.jar"/>
+        <path refid="Common.classpath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${Common.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Skinning.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${HandTrackingPro.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${java_util.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${Common.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Skinning.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${HandTrackingPro.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${java_util.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="camera.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${ColorCalib.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${ColorCalib.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Tabletop.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Tabletop.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Tabletop1.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Tabletop1.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${gesture.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${gesture.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="CameraDriverFirefly">
+        <java classname="edu.mit.yingyin.camera.CameraDriverFirefly" failonerror="true" fork="yes">
+            <classpath refid="camera.classpath"/>
+        </java>
+    </target>
+    <target name="CameraView">
+        <java classname="yingyin.webcam.gui.CameraView" failonerror="true" fork="yes">
+            <arg line="--save-dir=&quot;${workspace_loc}/HandTrackingServer\data_ying\handtracking\calibration\recording\&quot;"/>
+            <classpath refid="camera.classpath"/>
+        </java>
+    </target>
+</project>
