@@ -11,11 +11,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -76,24 +73,6 @@ public class CalibView extends JFrame implements KeyListener {
       }
     }
 
-    /**
-     * Save image to a particular path
-     * 
-     * @param fileName  path to save the image. If the path is not valid, an 
-     *                  error message is generated.
-     */
-    public void saveImage(String fileName) {
-      try {
-        ImageIO.write(myimg, "PNG", new File(fileName));
-      } catch (IOException e) {
-
-        // folder may not exist, show the error message
-        // the file is not saved, but the program can continue
-        System.err.println(e.getMessage());
-      }
-    }
-
-
     @Override
     public void mousePressed(MouseEvent e) {
       Point p = e.getPoint();
@@ -151,7 +130,7 @@ public class CalibView extends JFrame implements KeyListener {
     ip.setImage(bi);
     getContentPane().add(ip);
     addKeyListener(this);
-    this.setLocation(170, 150);
+    this.setLocation(0, 0);
   }
 
   public static void createAndShow(GeoCalibModel icm) {
@@ -183,6 +162,7 @@ public class CalibView extends JFrame implements KeyListener {
     case KeyEvent.VK_ESCAPE:
       System.exit(0);
       break;
+      
     default:
       break;
     }

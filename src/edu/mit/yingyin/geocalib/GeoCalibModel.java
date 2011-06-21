@@ -57,7 +57,9 @@ public class GeoCalibModel {
   /**
    * Use the first three clicked points to calculate the rest points.
    * 
-   * 0---1 | 2
+   * 0---1 
+   * | 
+   * 2
    */
   public void createPoints() {
     int width = imagePoints.get(1).x - imagePoints.get(0).x;
@@ -96,9 +98,9 @@ public class GeoCalibModel {
     String savePath;
 
     if (isCameraImage())
-      savePath = "cameraPoints.txt";
+      savePath = "data/cameraPoints.txt";
     else
-      savePath = "imagePoints.txt";
+      savePath = "data/imagePoints.txt";
 
     try {
       ps = new PrintStream(new FileOutputStream(savePath));
