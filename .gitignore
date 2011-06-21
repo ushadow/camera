@@ -1,4 +1,6 @@
 bin
+lib
+native
 .settings
 
 # VisualStudio intermdiate files and folder
