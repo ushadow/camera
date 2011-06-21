@@ -164,24 +164,25 @@ public class CalibView extends JFrame implements KeyListener {
 
   @Override
   public void keyPressed(KeyEvent ke) {
-    switch (ke.getKeyChar()) {
-    case 's':
+    switch (ke.getKeyCode()) {
+    case KeyEvent.VK_S:
       icm.saveImagePoints();
       break;
 
-    case 'p':
+    case KeyEvent.VK_P:
       icm.createPoints();
       ip.update();
       break;
 
-    case 'c':
+    case KeyEvent.VK_C:
       icm.clearPoints();
       ip.update();
       break;
 
-    case 'q':
+    case KeyEvent.VK_Q:
+    case KeyEvent.VK_ESCAPE:
       System.exit(0);
-
+      break;
     default:
       break;
     }

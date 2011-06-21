@@ -20,18 +20,18 @@ public class GeoCalibModel {
    * 
    * @author Ying Yin
    */
-  public enum ImageType {
+  public enum CalibImageType {
     PROJECTOR, CAMERA
   };
 
   private static final int NUM_ROW = 6;
   private static final int NUM_COL = 8;
 
-  private ImageType imageType;
+  private CalibImageType imageType;
   private List<Point> imagePoints; // list of points in the screen coordinates
   private BufferedImage bi;
 
-  public GeoCalibModel(ImageType imageType, String imagePath) {
+  public GeoCalibModel(CalibImageType imageType, String imagePath) {
     imagePoints = new ArrayList<Point>();
 
     this.imageType = imageType;
@@ -115,11 +115,11 @@ public class GeoCalibModel {
       ps.close();
   }
 
-  public ImageType getImageType() { return imageType; }
+  public CalibImageType getImageType() { return imageType; }
 
   public BufferedImage getImage() { return bi; }
 
-  public boolean isCameraImage() { return imageType == ImageType.CAMERA; }
+  public boolean isCameraImage() { return imageType == CalibImageType.CAMERA; }
 
   public void clearPoints() { imagePoints.clear(); }
 }
