@@ -19,7 +19,6 @@ public class GeoCalibModel {
    * projector to the tabletop. CAMERA is for image captured by the camera.
    * 
    * @author Ying Yin
-   * 
    */
   public enum ImageType {
     PROJECTOR, CAMERA
@@ -40,7 +39,6 @@ public class GeoCalibModel {
     try {
       bi = ImageIO.read(new File(imagePath));
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       System.err.println(imagePath);
       e.printStackTrace();
     }
