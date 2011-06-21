@@ -17,6 +17,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import edu.mit.yingyin.util.SystemUtils;
+
 public class CalibView extends JFrame implements KeyListener {
   private class ImagePanel extends JPanel implements MouseListener {
     private static final long serialVersionUID = 1L;
@@ -130,7 +132,13 @@ public class CalibView extends JFrame implements KeyListener {
     ip.setImage(bi);
     getContentPane().add(ip);
     addKeyListener(this);
-    this.setLocation(0, 0);
+    
+    Dimension screenSize = SystemUtils.getVirtualScreenBounds().getSize();
+    int xLoc = (screenSize.width - bi.getWidth()) / 2;
+    int yLoc = (screenSize.height - bi.getHeight()) / 2;
+    xLoc = xLoc < 0 ? 0 : xLoc;
+    yLoc = yLoc < 0 ? 0 : yLoc;
+    this.setLocation(xLoc, yLoc);
   }
 
   public static void createAndShow(GeoCalibModel icm) {
