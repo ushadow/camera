@@ -25,7 +25,7 @@ public class GeoCalibApp {
 	public static final ImageType IMAGE_TYPE = ImageType.CAMERA;
 	public static final String IMAGE_PATH = "CameraCalib/patternNumbered.png";
 	
-	//path to rectified camera image
+	/** Path to rectified camera image. */
 	public static final String CAMERA_IMAGE_PATH = "cameraImageRect.png";
 	
 	public static void main(String[] args) {
@@ -38,7 +38,7 @@ public class GeoCalibApp {
 					imagePath = IMAGE_PATH;
 				else imagePath = CAMERA_IMAGE_PATH;
 				
-				CalibFrame.createAndShow(new GeoCalibModel(IMAGE_TYPE, imagePath));
+				CalibView.createAndShow(new GeoCalibModel(IMAGE_TYPE, imagePath));
 			}
 		});		
 	}
