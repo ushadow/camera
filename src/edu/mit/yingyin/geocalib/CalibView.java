@@ -135,7 +135,7 @@ public class CalibView extends JFrame implements KeyListener {
     
     Dimension screenSize = SystemUtils.getVirtualScreenBounds().getSize();
     int xLoc = (screenSize.width - bi.getWidth()) / 2;
-    int yLoc = (screenSize.height - bi.getHeight()) / 2;
+    int yLoc = screenSize.height - bi.getHeight();
     xLoc = xLoc < 0 ? 0 : xLoc;
     yLoc = yLoc < 0 ? 0 : yLoc;
     this.setLocation(xLoc, yLoc);
