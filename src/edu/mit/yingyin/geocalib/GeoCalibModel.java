@@ -98,9 +98,9 @@ public class GeoCalibModel {
     String savePath;
 
     if (isCameraImage())
-      savePath = "data/cameraPoints.txt";
+      savePath = "data/cameraImagePoints.txt";
     else
-      savePath = "data/imagePoints.txt";
+      savePath = "data/virtualScreenPoints.txt";
 
     try {
       ps = new PrintStream(new FileOutputStream(savePath));
