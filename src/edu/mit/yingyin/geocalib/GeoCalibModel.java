@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import edu.mit.yingyin.util.FileUtil;
+
 public class GeoCalibModel {
 
   /**
@@ -27,14 +29,12 @@ public class GeoCalibModel {
   private static final int NUM_ROW = 6;
   private static final int NUM_COL = 8;
 
-  private CalibImageType imageType;
   private List<Point> imagePoints; // list of points in the screen coordinates
   private BufferedImage bi;
+  private String ptsFileName;
 
-  public GeoCalibModel(CalibImageType imageType, String imagePath) {
+  public GeoCalibModel(String imagePath) {
     imagePoints = new ArrayList<Point>();
-
-    this.imageType = imageType;
 
     try {
       bi = ImageIO.read(new File(imagePath));
@@ -42,6 +42,8 @@ public class GeoCalibModel {
       System.err.println(imagePath);
       e.printStackTrace();
     }
+    
+    ptsFileName = FileUtil.setExtension(imagePath, "pts");
   }
 
   public void removeLastPoint() {
@@ -95,21 +97,13 @@ public class GeoCalibModel {
   public void saveImagePoints() {
     PrintStream ps = null;
 
-    String savePath;
-
-    if (isCameraImage())
-      savePath = "data/cameraImagePoints.txt";
-    else
-      savePath = "data/virtualScreenPoints.txt";
-
     try {
-      ps = new PrintStream(new FileOutputStream(savePath));
+      ps = new PrintStream(new FileOutputStream(ptsFileName));
       for (Point p : imagePoints) {
         ps.println(p.x + " " + p.y);
       }
       System.out.println("Written to file.");
     } catch (FileNotFoundException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
@@ -117,11 +111,7 @@ public class GeoCalibModel {
       ps.close();
   }
 
-  public CalibImageType getImageType() { return imageType; }
-
   public BufferedImage getImage() { return bi; }
-
-  public boolean isCameraImage() { return imageType == CalibImageType.CAMERA; }
 
   public void clearPoints() { imagePoints.clear(); }
 }
