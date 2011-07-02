@@ -1,0 +1,13 @@
+Packages:
+* edu.mit.yingyin.camera
+** Contains wrappers for Firefly and Unibrain's cameras.
+
+Required jars:
+* commons-cli-1.2.jar
+* customizer.jar
+* jmf.jar
+* jmf.properties
+* mediaplayer.jar
+* multiplayer.jar
+* sound.jar
+* soundbank.gm

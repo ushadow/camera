@@ -34,6 +34,7 @@ import edu.mit.yingyin.util.CommandLineOptions;
  * @author Ying
  * 
  */
+@SuppressWarnings("static-access")
 public class CameraView extends JFrame implements WindowListener, KeyListener {
 
   static {
