@@ -11,3 +11,6 @@ Required jars:
 * multiplayer.jar
 * sound.jar
 * soundbank.gm
+
+Required java projects:
+* java_util
