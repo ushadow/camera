@@ -64,10 +64,10 @@ public class CameraDriverFirei {
 	
 	/**
 	 * Get the current value of the property and whether the property is set to 
-	 * auto of the camera 
-	 * @param property the property of the camera control
+	 * auto of the camera. 
+	 * @param property the property of the camera control.
 	 * @return a Vector of Integers, the first int is the value and the second is 
-	 * auto
+	 * whether auto is set.
 	 */
 	public Vector<Integer> getCurrentProperty(CameraControl property) {
 		IntBuffer value = DirectBufferUtils.allocateIntBuffer(1);
