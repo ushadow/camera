@@ -22,51 +22,51 @@ public class ImagePanel extends JPanel implements MouseListener {
 	private BufferedImage myimg = null;
 	private CameraView parent =null;
 	
-    public ImagePanel(CameraView mf) {
-      setLayout(null);
-      setPreferredSize(new Dimension(640,480));
-      parent = mf;
-      addMouseListener(this);
-      setOpaque(false);
+  public ImagePanel(CameraView mf) {
+    setLayout(null);
+    setPreferredSize(new Dimension(640, 480));
+    parent = mf;
+    addMouseListener(this);
+    setOpaque(false);
+  }
+  
+  public void setImage(BufferedImage img) {
+    this.myimg = img;
+    repaint();
+  }
+  
+  public void update(Graphics g) { paint(g); }
+  
+  public void paint(Graphics g) {
+    if (myimg != null) {
+  	  ((Graphics2D)g).drawImage(myimg, null, 0, 0);
     }
-    
-    public void setImage(BufferedImage img) {
-      this.myimg = img;
-      repaint();
-    }
-    
-    public void update(Graphics g) { paint(g); }
-    
-    public void paint(Graphics g) {
-      if (myimg != null) {
-    	  ((Graphics2D)g).drawImage(myimg, null, 0, 0);
-      }
-    }
-    
-    /**
-     * Save image to a particular path
-     * @param filePath full path to save the image. If the path is not valid, an error message is generated
-     */
-    public void saveImage(String filePath) {
-      File f = new File(filePath);
-      saveImage(f);
-    }
-    
-    public void saveImage(File f) {
-    	try {
-    		String extension = FileUtil.getExtension(f);
-    		if(extension == null || 
-    		   (!extension.equals(FileUtil.JPG)&&!extension.equals(FileUtil.PNG))) {
-    			extension = FileUtil.PNG;
-    			f = FileUtil.setExtension(f,extension);
-    		}
-    		
-    		ImageIO.write(myimg, extension, f);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    }
+  }
+  
+  /**
+   * Save image to a particular path
+   * @param filePath full path to save the image. If the path is not valid, an error message is generated
+   */
+  public void saveImage(String filePath) {
+    File f = new File(filePath);
+    saveImage(f);
+  }
+  
+  public void saveImage(File f) {
+  	try {
+  		String extension = FileUtil.getExtension(f);
+  		if(extension == null || 
+  		   (!extension.equals(FileUtil.JPG)&&!extension.equals(FileUtil.PNG))) {
+  			extension = FileUtil.PNG;
+  			f = FileUtil.setExtension(f,extension);
+  		}
+  		
+  		ImageIO.write(myimg, extension, f);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  }
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
