@@ -92,7 +92,7 @@ public class CameraView extends JFrame implements WindowListener, KeyListener {
 	 * Create an instance of main frame for displaying image frame captured from 
 	 * webcam
 	 * @param title title of the main frame
-	 * @param _wdf	webcam driver for Firei cambera, it has to be initialized 
+	 * @param _wdf	webcam driver for Firei camera, it has to be initialized 
 	 * before passed as a parameter
 	 */
 	public CameraView(String title, CameraModel webcamModel){

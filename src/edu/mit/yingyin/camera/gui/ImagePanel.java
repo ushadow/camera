@@ -45,7 +45,8 @@ public class ImagePanel extends JPanel implements MouseListener {
   
   /**
    * Save image to a particular path
-   * @param filePath full path to save the image. If the path is not valid, an error message is generated
+   * @param filePath full path to save the image. If the path is not valid, an 
+   *    error message is generated
    */
   public void saveImage(String filePath) {
     File f = new File(filePath);
@@ -75,9 +76,9 @@ public class ImagePanel extends JPanel implements MouseListener {
 		parent.setStatus(" X: " + p.x +
         						 " Y: " + p.y +
         						 " B: " + (short)(value & 0x000000FF)+ 
-      					     " G: " + (short)((value>>8)& 0x000000FF)+ 
-      					     " R: " + (short)((value>>16)&0x000000FF)+ 
-      					     " A: " + (short)((value>>24)&0x000000FF));
+      					     " G: " + (short)((value >> 8) & 0x000000FF)+ 
+      					     " R: " + (short)((value >> 16) & 0x000000FF)+ 
+      					     " A: " + (short)((value >> 24) & 0x000000FF));
 		
 	}
 
